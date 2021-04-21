@@ -61,7 +61,6 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -128,6 +127,7 @@ celerybeat-schedule
 .venv
 env/
 venv/
+.virtualenv/
 ENV/
 env.bak/
 venv.bak/

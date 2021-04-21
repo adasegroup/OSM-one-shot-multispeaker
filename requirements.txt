@@ -1,9 +1,6 @@
 tqdm
 numpy
 matplotlib
-requests
-tqdm
-scikit-image
 scipy
 torch
 torchvision
