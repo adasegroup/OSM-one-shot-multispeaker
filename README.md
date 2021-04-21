@@ -26,10 +26,3 @@ Gleb will implement working stack of models, write documentations and usage exam
 3. [Jonathan  Shen,  R.  Pang,  Ron  J.  Weiss,  M.  Schuster,  Navdeep  Jaitly,Z. Yang, Z. Chen, Yu Zhang, Yuxuan Wang, R. Skerry-Ryan, R. Saurous,Yannis Agiomyrgiannakis, and Y. Wu. Natural TTS synthesis by conditioning wavenet on mel spectrogram predictions,](https://arxiv.org/pdf/1712.05884.pdf)
 4. [ Aaron  van  den  Oord,  S.  Dieleman,  H.  Zen,  K.  Simonyan,  Oriol  Vinyals,A. Graves, Nal Kalchbrenner, A. Senior, and K. Kavukcuoglu.  Wavenet:  Agenerative model for raw audio,](https://arxiv.org/pdf/1609.03499.pdf)
 5. [Erica  Cooper,  Cheng-I  Lai,  Yusuke  Yasuda,  Fuming  Fang,  Xin  Wang,Nanxin  Chen,  and  Junichi  Yamagishi.    Zero-shot  multi-speaker  text-to-speech with state-of-the-art neural speaker embeddings.](https://arxiv.org/pdf/1910.10838.pdf)
-
-
-
-## Overview
-
-
-## Setup
