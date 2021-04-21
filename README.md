@@ -9,7 +9,7 @@ Finally, the speech is reproduced from the mel-spectrogram with the Vocoder. But
 ## Main Challenges
 By now we see the following main challenges:
 - The solution to our problem consists of three subtasks, which already have a great solutions. Therefore, the existing solutions for OS MS TTS are essentially a compilation of solutions for these individual problems, for which there are many ready-made and well-implemented solutions. The main challenge is to made the framework flexible and ensure the compatibility of individual parts.
--The methods used in each subtask differ in the set of parameters and the nature of the algorithm. Therefore, it will be quite difficult to provide them with a single API.
+- The methods used in each subtask differ in the set of parameters and the nature of the algorithm. Therefore, it will be quite difficult to provide them with a single API.
 
 
 ## Overview
