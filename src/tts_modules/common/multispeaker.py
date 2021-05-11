@@ -1,5 +1,5 @@
 import torch
-from src.tts_modules.encoder.encoder_manager import EncoderManager
+from src.tts_modules.encoder.SpeakerEncoderManager import SpeakerEncoderManager
 from src.tts_modules.synthesizer.synthesizer_manager import SynthesizerManager
 from src.tts_modules.vocoder.vocoder_manager import VocoderManager
 
@@ -14,11 +14,10 @@ class MultispeakerManager:
                  vocoder=None, vocoder_checkpoint_path=None,
                  vocoder_test_dataloader=None, vocoder_train_dataloader=None):
         self.configs = configs
-        self.encoder_manager = EncoderManager(configs,
+        self.encoder_manager = SpeakerEncoderManager(configs,
                                               model=encoder,
-                                              checkpoint_path=encoder_checkpoint_path,
-                                              test_dataloader=encoder_test_dataloader,
-                                              train_dataloader=encoder_train_dataloader)
+                                              checkpoint_path=encoder_checkpoint_path)
+
         self.synthesizer_manager = SynthesizerManager(configs,
                                                       model=synthesizer,
                                                       checkpoint_path=synthesizer_checkpoint_path,
@@ -37,9 +36,11 @@ class MultispeakerManager:
     def inference(self):
         pass
 
-    def process_speaker(self, speaker_speech_path, do_save_embeddings=True):
+    def process_speaker(self, speaker_speech_path, save_embeddings_path=None,
+                        save_embeddings_speaker_name="test_speaker"):
         self.encoder_manager.process_speaker(speaker_speech_path,
-                                             do_save_embeddings=do_save_embeddings)
+                                             save_embeddings_path=save_embeddings_path,
+                                             save_embeddings_speaker_name=save_embeddings_speaker_name)
 
     def synthesize_spectrograms(self, texts, embeddings, do_save_spectrograms=True):
         self.synthesizer_manager.synthesize_spectrograms(texts, embeddings,

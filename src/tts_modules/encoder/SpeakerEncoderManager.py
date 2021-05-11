@@ -1,23 +1,37 @@
-import .SpeakerEncoderDataset
 from torch.utils.data import Dataset, DataLoader
 import torch
 import numpy as np
 import yaml
-
+import os
 class SpeakerEncoderManager():
-    def __init__(self, configs, model, preprocessor=None, wav2mel=None):
+    def __init__(self, configs, model, checkpoint_path,  preprocessor=None, wav2mel=None):
         self.model = model
         self.configs = configs
         self.preprocessor = preprocessor
         self.wav2mel = wav2mel
-        self.current_emded = None
+        self.checkpoint_path = checkpoint_path
+        self.current_embed = None
         with open(configs["AudioConfig"], "r") as ymlfile:
             self.AudioConfig = yaml.load(ymlfile)
 
 
+    def process_speaker(self, speaker_speech_path, save_embeddings_path=None,
+                        save_embeddings_speaker_name="test_speaker"):
+        processed_wav = self.preprocessor.preprocess_wav(speaker_speech_path)
 
-    def __load_model(self, checkpoint_path):
-        checkpoint = torch.load(checkpoint_path)
+        embed = self.embed_utterance(processed_wav)
+        self.current_embed = embed
+        if save_embeddings_path is not None:
+            self.save_embeddings(self,save_embeddings_path, save_embeddings_speaker_name, self.current_embed)
+
+        return embed
+
+
+    def save_embeddings(self, save_embeddings_path,save_embeddings_speaker_name):
+        np.save(os.path.join(save_embeddings_path,save_embeddings_speaker_name), )
+
+    def __load_model(self):
+        checkpoint = torch.load(self.checkpoint_path)
         self.model.load_state_dict(checkpoint["model_state"])
         self.model.eval()
 
@@ -25,11 +39,11 @@ class SpeakerEncoderManager():
 
         # Process the entire utterance if not using partials
         if not using_partials:
-            processed_wav = self.preprocessor.preprocess_wav(wav)
-            frames = self.wav2mel.Wav2Mel(processed_wav)
+            # processed_wav = self.preprocessor.preprocess_wav(wav)
+            frames = self.wav2mel.Wav2Mel(wav)
             frames = torch.from_numpy(frames[None, ...]).to(0)
             embed = self.model.forward(frames).detach().cpu().numpy()
-            self.current_emded = embed[0]
+            self.current_embed = embed[0]
             if return_partials:
                 return embed[0], None, None
 
@@ -42,8 +56,8 @@ class SpeakerEncoderManager():
             wav = np.pad(wav, (0, max_wave_length - len(wav)), "constant")
 
         # Split the utterance into partials
-        processed_wav = self.preprocessor.preprocess_wav(wav)
-        frames = self.wav2mel.Wav2Mel(processed_wav)
+        # processed_wav = self.preprocessor.preprocess_wav(wav)
+        frames = self.wav2mel.Wav2Mel(wav)
         frames_batch = np.array([frames[s] for s in mel_slices])
         frames = torch.from_numpy(frames_batch).to(0)
         partial_embeds = self.model.forward(frames).detach().cpu().numpy()
@@ -51,7 +65,7 @@ class SpeakerEncoderManager():
         # Compute the utterance embedding from the partial embeddings
         raw_embed = np.mean(partial_embeds, axis=0)
         embed = raw_embed / np.linalg.norm(raw_embed, 2)
-        self.current_emded = embed
+        self.current_embed = embed
         if return_partials:
             return embed, partial_embeds, wave_slices
         return embed
