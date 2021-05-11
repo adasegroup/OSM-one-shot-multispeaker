@@ -118,7 +118,7 @@ class WaveRNN(nn.Module):
         self.fc3 = nn.Linear(fc_dims, self.n_classes)
 
         self.step = nn.Parameter(torch.zeros(1).long(), requires_grad=False)
-        self.num_params()
+        # self.num_params()
 
     def forward(self, x, mels):
         self.step += 1
