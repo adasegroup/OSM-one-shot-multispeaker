@@ -1,9 +1,9 @@
 import torch
-from synthesizer.configs.hparams import hparams
-from synthesizer.utils import audio
-from synthesizer.utils.symbols import symbols
-from synthesizer.utils.text import text_to_sequence
-from synthesizer.models.tacotron import Tacotron
+from tts_modules.synthesizer.configs.hparams import hparams
+# from tts_modules.synthesizer.utils import audio
+from tts_modules.synthesizer.utils.symbols import symbols
+from tts_modules.synthesizer.utils.text import text_to_sequence
+from tts_modules.synthesizer.models.tacotron import Tacotron
 from pathlib import Path
 from typing import Union, List
 import numpy as np

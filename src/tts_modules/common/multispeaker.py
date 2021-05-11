@@ -1,7 +1,8 @@
 import torch
-from src.tts_modules.encoder.SpeakerEncoderManager import SpeakerEncoderManager
-from src.tts_modules.synthesizer.synthesizer_manager import SynthesizerManager
-from src.tts_modules.vocoder.vocoder_manager import VocoderManager
+# from tts_modules.encoder.encoder_manager import EncoderManager
+from tts_modules.synthesizer.synthesizer_manager import SynthesizerManager
+from tts_modules.vocoder.vocoder_manager import VocoderManager
+import yaml
 
 
 

@@ -10,3 +10,6 @@ ipython
 librosa
 SoundFile
 inflect
+PyYAML
+notebook
+unidecode

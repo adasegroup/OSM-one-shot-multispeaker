@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from vocoder.utils.distribution import sample_from_discretized_mix_logistic
-from vocoder.utils.audio import *
-import vocoder.configs.hparams as hp
+from tts_modules.vocoder.utils.distribution import sample_from_discretized_mix_logistic
+from tts_modules.vocoder.utils.audio import *
+import tts_modules.vocoder.configs.hparams as hp
 
 
 class ResBlock(nn.Module):

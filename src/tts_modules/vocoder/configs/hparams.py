@@ -1,4 +1,4 @@
-from synthesizer.configs.hparams import hparams as _syn_hp
+from tts_modules.synthesizer.configs.hparams import hparams as _syn_hp
 
 
 # Audio settings------------------------------------------------------------------------
