@@ -5,7 +5,6 @@ import yaml
 import os
 class SpeakerEncoderManager():
     def __init__(self, configs, model, checkpoint_path,  preprocessor=None, wav2mel=None):
-        self.model = model
         self.configs = configs
         self.preprocessor = preprocessor
         self.wav2mel = wav2mel
@@ -13,7 +12,11 @@ class SpeakerEncoderManager():
         self.current_embed = None
         with open(configs["AudioConfig"], "r") as ymlfile:
             self.AudioConfig = yaml.load(ymlfile)
-
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
+        else:
+            self.device = torch.device("cpu")
+        self.model = model.to(self.device)
 
     def process_speaker(self, speaker_speech_path, save_embeddings_path=None,
                         save_embeddings_speaker_name="test_speaker"):
@@ -22,7 +25,7 @@ class SpeakerEncoderManager():
         embed = self.embed_utterance(processed_wav)
         self.current_embed = embed
         if save_embeddings_path is not None:
-            self.save_embeddings(self,save_embeddings_path, save_embeddings_speaker_name, self.current_embed)
+            self.save_embeddings(self, save_embeddings_path, save_embeddings_speaker_name)
 
         return embed
 
@@ -41,7 +44,7 @@ class SpeakerEncoderManager():
         if not using_partials:
             # processed_wav = self.preprocessor.preprocess_wav(wav)
             frames = self.wav2mel.Wav2Mel(wav)
-            frames = torch.from_numpy(frames[None, ...]).to(0)
+            frames = torch.from_numpy(frames[None, ...]).to(self.device)
             embed = self.model.forward(frames).detach().cpu().numpy()
             self.current_embed = embed[0]
             if return_partials:
@@ -59,7 +62,7 @@ class SpeakerEncoderManager():
         # processed_wav = self.preprocessor.preprocess_wav(wav)
         frames = self.wav2mel.Wav2Mel(wav)
         frames_batch = np.array([frames[s] for s in mel_slices])
-        frames = torch.from_numpy(frames_batch).to(0)
+        frames = torch.from_numpy(frames_batch).to(self.device)
         partial_embeds = self.model.forward(frames).detach().cpu().numpy()
 
         # Compute the utterance embedding from the partial embeddings
