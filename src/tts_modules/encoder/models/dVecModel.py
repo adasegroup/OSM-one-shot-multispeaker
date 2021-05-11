@@ -20,7 +20,7 @@ import torch
 # utterances_per_speaker = 10
 
 
-class SpeakerEncoder(nn.Module):
+class DVecModel(nn.Module):
     def __init__(self, device, loss_device, params):
         super().__init__()
         self.loss_device = loss_device

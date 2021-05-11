@@ -1,13 +1,21 @@
-from torch.utils.data import Dataset, DataLoader
+from tts_modules.encoder.models.dVecModel import DVecModel
+from tts_modules.encoder.data.WavPreprocessor import StandardAudioPreprocessor
+from tts_modules.encoder.data.Wav2MelTransform import StandardWav2MelTransform
+
 import torch
 import numpy as np
 import yaml
 import os
-class SpeakerEncoderManager():
+class SpeakerEncoderManager:
     def __init__(self, configs, model, checkpoint_path,  preprocessor=None, wav2mel=None):
         self.configs = configs
         self.preprocessor = preprocessor
+        if preprocessor is None:
+            self.preprocessor = StandardAudioPreprocessor(configs["AudioConfig"])
         self.wav2mel = wav2mel
+        if wav2mel is None:
+            self.wav2mel = StandardWav2MelTransform(configs["AudioConfig"])
+
         self.checkpoint_path = checkpoint_path
         self.current_embed = None
         with open(configs["AudioConfig"], "r") as ymlfile:
@@ -16,7 +24,18 @@ class SpeakerEncoderManager():
             self.device = torch.device("cuda")
         else:
             self.device = torch.device("cpu")
+        if model is None:
+            self.__init_dvec_model()
+            self.__load_model()
         self.model = model.to(self.device)
+
+    def __init_dvec_model(self):
+        with open(self.configs["SpeakerEncoderConfig"], "r") as ymlfile:
+            self.SpeakerEncoderConfig = yaml.load(ymlfile)
+        self.model = DVecModel(self.device, self.device, self.SpeakerEncoderConfig)
+
+
+
 
     def process_speaker(self, speaker_speech_path, save_embeddings_path=None,
                         save_embeddings_speaker_name="test_speaker"):
@@ -30,15 +49,15 @@ class SpeakerEncoderManager():
         return embed
 
 
-    def save_embeddings(self, save_embeddings_path, save_embeddings_speaker_name):
-        np.save(os.path.join(save_embeddings_path, save_embeddings_speaker_name), )
+    def save_embeddings(self, save_embeddings_path,save_embeddings_speaker_name):
+        np.save(os.path.join(save_embeddings_path,save_embeddings_speaker_name), self.current_embed)
 
     def __load_model(self):
         checkpoint = torch.load(self.checkpoint_path)
         self.model.load_state_dict(checkpoint["model_state"])
         self.model.eval()
 
-    def emded_utterance(self, wav, using_partials=True, return_partials=False):
+    def embed_utterance(self, wav, using_partials=True, return_partials=False):
 
         # Process the entire utterance if not using partials
         if not using_partials:
