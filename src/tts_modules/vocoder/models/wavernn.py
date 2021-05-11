@@ -91,6 +91,10 @@ class WaveRNN(nn.Module):
                  feat_dims, compute_dims, res_out_dims, res_blocks,
                  hop_length, sample_rate, mode='RAW'):
         super().__init__()
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
+        else:
+            self.device = torch.device("cpu")
         self.mode = mode
         self.pad = pad
         if self.mode == 'RAW':
@@ -114,7 +118,7 @@ class WaveRNN(nn.Module):
         self.fc3 = nn.Linear(fc_dims, self.n_classes)
 
         self.step = nn.Parameter(torch.zeros(1).long(), requires_grad=False)
-        self.num_params()
+        # self.num_params()
 
     def forward(self, x, mels):
         self.step += 1
@@ -387,7 +391,7 @@ class WaveRNN(nn.Module):
             print(msg, file=f)
 
     def load(self, path, optimizer=None):
-        checkpoint = torch.load(path)
+        checkpoint = torch.load(path, map_location=self.device)
         if "optimizer_state" in checkpoint:
             self.load_state_dict(checkpoint["model_state"])
             if optimizer is not None:

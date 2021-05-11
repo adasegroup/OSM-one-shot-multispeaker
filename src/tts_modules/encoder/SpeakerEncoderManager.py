@@ -6,6 +6,8 @@ import torch
 import numpy as np
 import yaml
 import os
+
+
 class SpeakerEncoderManager:
     def __init__(self, configs, model, checkpoint_path,  preprocessor=None, wav2mel=None):
         self.configs = configs
@@ -27,16 +29,19 @@ class SpeakerEncoderManager:
         if model is None:
             self.__init_dvec_model()
             self.__load_model()
-        self.model = model.to(self.device)
+        self.model = self.model.to(self.device)
 
     def __init_dvec_model(self):
         with open(self.configs["SpeakerEncoderConfig"], "r") as ymlfile:
             self.SpeakerEncoderConfig = yaml.load(ymlfile)
         self.model = DVecModel(self.device, self.device, self.SpeakerEncoderConfig)
 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> origin/main
     def process_speaker(self, speaker_speech_path, save_embeddings_path=None,
                         save_embeddings_speaker_name="test_speaker"):
         processed_wav = self.preprocessor.preprocess_wav(speaker_speech_path)
@@ -48,12 +53,15 @@ class SpeakerEncoderManager:
 
         return embed
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
     def save_embeddings(self, save_embeddings_path,save_embeddings_speaker_name):
         np.save(os.path.join(save_embeddings_path,save_embeddings_speaker_name), self.current_embed)
 
     def __load_model(self):
-        checkpoint = torch.load(self.checkpoint_path)
+        checkpoint = torch.load(self.checkpoint_path, map_location=self.device)
         self.model.load_state_dict(checkpoint["model_state"])
         self.model.eval()
 
@@ -118,9 +126,9 @@ class SpeakerEncoderManager:
         utterances.
         """
         config = self.AudioConfig
-        sampling_rate = config.SAMPLING_RATE
-        mel_window_step = config.MEL_WINDOW_STEP
-        partial_utterance_n_frames = config.PARTIAL_UTTERANCE_N_FRAMES
+        sampling_rate = config["SAMPLING_RATE"]
+        mel_window_step = config["MEL_WINDOW_STEP"]
+        partial_utterance_n_frames = config["PARTIAL_UTTERANCE_N_FRAMES"]
 
         assert 0 <= overlap < 1
         assert 0 < min_pad_coverage <= 1
@@ -147,32 +155,6 @@ class SpeakerEncoderManager:
 
         return wav_slices, mel_slices
 
-
-
-
-
-
-
-# class SpeakerEncoderManager(nn.Module):
-#     def __init__(self, model, train_dataset = None, val_dataset=None, train_preprocessor=None,
-#                  val_preprocessor=None, **configs):
-#         self.model = model
-#         if train_dataset is None and train_preprocessor is None:
-#             self.dataset = LibriSpeechDataset(configs["dataset_config"], StandardPreprocessor(configs["audio_config"]))
-#             self.preprocessor = StandardPreprocessor(configs["audio_config"])
-#         elif dataset is None and preprocessor is not None:
-#             self.dataset = LibriSpeechDataset(configs["dataset_config"], preprocessor)
-#             self.preprocessor = preprocessor
-#         else:
-#             self.dataset = dataset
-#             self.preprocessor = preprocessor
-#         self.configs = configs
-#
-#         # self.dataloader = DataLoader(self.dataset, configs["dataloader_config"])
-#
-#     # def init_dataloader(self, **dataloader_params):
-#
-#     def forward(self):
 
 
 
