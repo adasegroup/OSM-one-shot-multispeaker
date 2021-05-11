@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-
 try:
     # pip >=20
     from pip._internal.network.session import PipSession
