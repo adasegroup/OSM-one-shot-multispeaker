@@ -41,7 +41,7 @@ class VocoderManager:
         mel = torch.from_numpy(mel[None, ...])
         wav = self.model.generate(mel, batched, target, overlap, hp.mu_law)
         if do_save_wav:
-            save_wav(wav, os.path.join(self.configs.wav_save_path, 'result.wav'))
+            save_wav(wav, os.path.join(self.configs["OUTPUT_AUDIO_DIR"], 'result.wav'))
         return wav
 
 
