@@ -1,5 +1,5 @@
 import torch
-# from tts_modules.encoder.encoder_manager import EncoderManager
+from tts_modules.encoder.SpeakerEncoderManager import SpeakerEncoderManager
 from tts_modules.synthesizer.synthesizer_manager import SynthesizerManager
 from tts_modules.vocoder.vocoder_manager import VocoderManager
 import yaml
@@ -17,16 +17,16 @@ class MultispeakerManager:
         self.configs = configs
         self.encoder_manager = SpeakerEncoderManager(configs,
                                               model=encoder,
-                                              checkpoint_path=encoder_checkpoint_path)
+                                              checkpoint_path=self.configs["SPEAKER_ENCODER_CHECKPOINT_PATH"])
 
         self.synthesizer_manager = SynthesizerManager(configs,
                                                       model=synthesizer,
-                                                      checkpoint_path=synthesizer_checkpoint_path,
+                                                      checkpoint_path=self.configs["SYNTHESIZER_CHECKPOINT_PATH"],
                                                       test_dataloader=synthesizer_test_dataloader,
                                                       train_dataloader=synthesizer_train_dataloader)
         self.vocoder_manager = VocoderManager(configs,
                                               model=vocoder,
-                                              checkpoint_path=vocoder_checkpoint_path,
+                                              checkpoint_path=self.configs["VOCODER_CHECKPOINT_PATH"],
                                               test_dataloader=vocoder_test_dataloader,
                                               train_dataloader=vocoder_train_dataloader)
         if torch.cuda.is_available():

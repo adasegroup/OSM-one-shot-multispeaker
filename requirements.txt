@@ -13,3 +13,4 @@ inflect
 PyYAML
 notebook
 unidecode
+webrtcvad-wheels

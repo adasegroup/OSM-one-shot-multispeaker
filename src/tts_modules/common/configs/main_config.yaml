@@ -1,0 +1,11 @@
+AudioConfig: "tts_modules/encoder/configs/AudioConfig.yaml"
+SpeakerEncoderConfig: "tts_modules/encoder/configs/dVecModelConfig.yaml"
+
+SPEAKER_ENCODER_CHECKPOINT_PATH: "tts_modules/encoder/models/pretrained.pt"
+SYNTHESIZER_CHECKPOINT_PATH: "tts_modules/synthesizer/models/pretrained.pt"
+VOCODER_CHECKPOINT_PATH: "tts_modules/vocoder/models/pretrained.pt"
+
+SPEAKER_UTTERANCES_DIR: "../audio_samples"
+OUTPUT_AUDIO_DIR: "../result_speech"
+
+

@@ -24,10 +24,10 @@ class StandardWav2MelTransform(Wav2MelTransform):
         Derives a mel spectrogram ready to be used by the encoder from a preprocessed audio waveform.
         Note: this not a log-mel spectrogram.
         """
-        sampling_rate = self.audio_config_yaml.SAMPLING_RATE
-        mel_window_length = self.audio_config_yaml.MEL_WINDOW_LENGTH
-        mel_window_step = self.audio_config_yaml.MEL_WINDOW_STEP
-        mel_n_channels = self.audio_config_yaml.MEL_N_CHANNELS
+        sampling_rate = self.audio_config_yaml["SAMPLING_RATE"]
+        mel_window_length = self.audio_config_yaml["MEL_WINDOW_LENGTH"]
+        mel_window_step = self.audio_config_yaml["MEL_WINDOW_STEP"]
+        mel_n_channels = self.audio_config_yaml["MEL_N_CHANNELS"]
         frames = librosa.feature.melspectrogram(
             wav,
             sampling_rate,

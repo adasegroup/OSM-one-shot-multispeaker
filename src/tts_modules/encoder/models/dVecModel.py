@@ -26,12 +26,12 @@ class DVecModel(nn.Module):
         self.loss_device = loss_device
 
         # Network defition
-        self.lstm = nn.LSTM(input_size=params.mel_n_channels,
-                            hidden_size=params.model_hidden_size,
-                            num_layers=params.model_num_layers,
+        self.lstm = nn.LSTM(input_size=params["MEL_N_CHANNELS"],
+                            hidden_size=params["model_hidden_size"],
+                            num_layers=params["model_num_layers"],
                             batch_first=True).to(device)
-        self.linear = nn.Linear(in_features=params.model_hidden_size,
-                                out_features=params.model_embedding_size).to(device)
+        self.linear = nn.Linear(in_features=params["model_hidden_size"],
+                                out_features=params["model_embedding_size"]).to(device)
         self.relu = torch.nn.ReLU().to(device)
 
         # Cosine similarity scaling (with fixed initial parameter values)
