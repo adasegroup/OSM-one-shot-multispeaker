@@ -1,5 +1,5 @@
-from vocoder.models.wavernn import WaveRNN
-from vocoder.configs import hparams as hp
+from tts_modules.vocoder.models.wavernn import WaveRNN
+from tts_modules.vocoder.configs import hparams as hp
 import torch
 import os
 

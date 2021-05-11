@@ -30,8 +30,8 @@ class SpeakerEncoderManager():
         return embed
 
 
-    def save_embeddings(self, save_embeddings_path,save_embeddings_speaker_name):
-        np.save(os.path.join(save_embeddings_path,save_embeddings_speaker_name), )
+    def save_embeddings(self, save_embeddings_path, save_embeddings_speaker_name):
+        np.save(os.path.join(save_embeddings_path, save_embeddings_speaker_name), )
 
     def __load_model(self):
         checkpoint = torch.load(self.checkpoint_path)

@@ -1,7 +1,7 @@
 import math
 import numpy as np
 import librosa
-import vocoder.configs.hparams as hp
+import tts_modules.vocoder.configs.hparams as hp
 from scipy.signal import lfilter
 import soundfile as sf
 

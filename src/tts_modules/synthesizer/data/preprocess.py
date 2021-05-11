@@ -1,8 +1,8 @@
 from multiprocessing.pool import Pool
-from synthesizer import audio
+from tts_modules.synthesizer.utils import audio
 from functools import partial
 from itertools import chain
-from encoder import inference as encoder
+from tts_modules.encoder import inference as encoder
 from pathlib import Path
 from utils import logmmse
 from tqdm import tqdm
