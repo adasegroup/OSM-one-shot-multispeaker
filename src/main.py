@@ -1,5 +1,6 @@
 import argparse
 import yaml
+import os
 from tts_modules.common.multispeaker import MultispeakerManager
 
 if __name__ == "__main__":
@@ -11,6 +12,15 @@ if __name__ == "__main__":
 
     with open(args.main_config_path, "r") as ymlfile:
         main_configs = yaml.load(ymlfile)
+
+    if not os.path.exists(main_configs["SPEAKER_SPEECH_PATH"]):
+        os.makedirs(main_configs["SPEAKER_SPEECH_PATH"])
+
+    if not os.path.exists(main_configs["INPUT_TEXTS_PATH"]):
+        os.makedirs(main_configs["INPUT_TEXTS_PATH"])
+
+    if not os.path.exists(main_configs["OUTPUT_AUDIO_DIR"]):
+        os.makedirs(main_configs["OUTPUT_AUDIO_DIR"])
 
     multispeaker_manager = MultispeakerManager(main_configs)
     multispeaker_manager.inference()

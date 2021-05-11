@@ -39,6 +39,7 @@ class MultispeakerManager:
         with open(self.configs["INPUT_TEXTS_PATH"], "r") as file:
             texts = file.readlines()
         specs = self.synthesize_spectrograms(texts=texts, embeddings=embeddings)
+        specs = specs[0]
         wav = self.generate_waveform(specs)
         return wav
 

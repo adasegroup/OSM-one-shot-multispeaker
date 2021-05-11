@@ -5,8 +5,8 @@ SPEAKER_ENCODER_CHECKPOINT_PATH: "tts_modules/encoder/models/pretrained.pt"
 SYNTHESIZER_CHECKPOINT_PATH: "tts_modules/synthesizer/models/pretrained.pt"
 VOCODER_CHECKPOINT_PATH: "tts_modules/vocoder/models/pretrained.pt"
 
-SPEAKER_SPEECH_PATH: "../audio_samples"
-INPUT_TEXTS_PATH: "../texts"
+SPEAKER_SPEECH_PATH: "../audio_samples/google_test.wav"
+INPUT_TEXTS_PATH: "../texts/test1.txt"
 OUTPUT_AUDIO_DIR: "../result_speech"
 
 

@@ -1,5 +1,6 @@
 from tts_modules.vocoder.models.wavernn import WaveRNN
 from tts_modules.vocoder.configs import hparams as hp
+from tts_modules.vocoder.utils.audio import save_wav
 import torch
 import os
 
