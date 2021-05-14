@@ -2,6 +2,7 @@ import yaml
 import numpy as np
 import librosa
 
+
 class Wav2MelTransform(object):
     """Interface """
 
@@ -14,6 +15,7 @@ class Wav2MelTransform(object):
 
     def Wav2Mel(self, *args, **kwargs):
         pass
+
 
 class StandardWav2MelTransform(Wav2MelTransform):
     def __init__(self, audio_config_yaml_path):

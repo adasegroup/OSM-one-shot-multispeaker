@@ -13,6 +13,7 @@ except:
     warn("Unable to import 'webrtcvad'. This package enables noise removal and is recommended.")
     webrtcvad=None
 
+
 class WavPreprocessor(object):
     """Interface """
     def __init__(self, audio_config_yaml_path):
@@ -25,8 +26,6 @@ class WavPreprocessor(object):
 
     def preprocess_wav(self, *args, **kwargs):
         pass
-
-        
 
 
 class StandardAudioPreprocessor(WavPreprocessor):
@@ -120,6 +119,7 @@ class StandardAudioPreprocessor(WavPreprocessor):
         # Apply the preprocessing: normalize volume and shorten long silences
         if normalize:
             wav = self.normalize_volume(wav, audio_norm_target_dBFS, increase_only=True)
+
         if webrtcvad and trim_silence:
             wav = self.trim_long_silences(wav)
 
