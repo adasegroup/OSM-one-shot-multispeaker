@@ -9,6 +9,46 @@ import os
 
 
 class SpeakerEncoderManager:
+    """Attributes
+        ----------
+        configs: dict
+            dictionary of configuration files
+        preprocessor: AudioPreprocessor
+            preprocess wav audio
+        wav2mel: Wav2MelTransform
+            transfrom preprocessed wav to mel spectogram
+        checkpoint_path: str
+            path to checkpoint file
+        current_embed: numpy.array
+            the latest produced embedding
+        AudioConfig: dict
+            Audio Configuration file
+        device: int
+            Chosen GPU
+        model : nn.Module
+            Speaker Encoder NN model
+        Methods
+        -------
+        __init_dvec_model()
+            initialize baseline model
+        __load_model()
+            load baseline checkpoint
+
+        process_speaker(speaker_speech_path, save_embeddings_path=None,
+                        save_embeddings_speaker_name="test_speaker")
+            produce embeddings for one utterance
+
+        save_embeddings(save_embeddings_path,save_embeddings_speaker_name)
+            save embeddings for given path and name
+
+        embed_utterance(wav, using_partials=True, return_partials=False)
+            calculate embeddings for given wav
+
+        compute_partial_slices(n_samples, min_pad_coverage=0.75, overlap=0.5)
+            Computes where to split an utterance waveform and its corresponding mel spectrogram to obtain
+            partial utterances of <partial_utterance_n_frames> each.
+
+        """
     def __init__(self, configs, model, checkpoint_path,  preprocessor=None, wav2mel=None):
         self.configs = configs
         self.preprocessor = preprocessor
@@ -32,18 +72,15 @@ class SpeakerEncoderManager:
         self.model = self.model.to(self.device)
 
     def __init_dvec_model(self):
+        """ initialize baseline model"""
         with open(self.configs["SpeakerEncoderConfig"], "r") as ymlfile:
             self.SpeakerEncoderConfig = yaml.load(ymlfile)
         self.model = DVecModel(self.device, self.device, self.SpeakerEncoderConfig)
 
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> origin/main
     def process_speaker(self, speaker_speech_path, save_embeddings_path=None,
                         save_embeddings_speaker_name="test_speaker"):
+
+        """ produce embeddings for one utterance"""
         processed_wav = self.preprocessor.preprocess_wav(speaker_speech_path)
 
         embed = self.embed_utterance(processed_wav)
@@ -53,10 +90,6 @@ class SpeakerEncoderManager:
 
         return embed
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
     def save_embeddings(self, save_embeddings_path,save_embeddings_speaker_name):
         np.save(os.path.join(save_embeddings_path,save_embeddings_speaker_name), self.current_embed)
 
