@@ -6,6 +6,7 @@ from tts_modules.synthesizer.utils.text import text_to_sequence
 
 
 class SynthesizerDataset(Dataset):
+
     def __init__(self, metadata_fpath: Path, mel_dir: Path, embed_dir: Path, hparams):
         print("Using inputs from:\n\t%s\n\t%s\n\t%s" % (metadata_fpath, mel_dir, embed_dir))
 

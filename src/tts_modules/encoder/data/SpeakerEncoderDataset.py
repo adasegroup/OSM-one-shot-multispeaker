@@ -2,20 +2,6 @@
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
 
-# class SpeakerEncoderDataset(Dataset):
-#     """Speaker Encoder Dataset"""
-#
-#     def __init__(self, datasets_root, dataset_name, wav_preprocess=None, mel2wav = None):
-#         """
-#         Args:
-#             datasets_root (string): Path to the directory with datasets.
-#             dataset_name (string): dataset_name.
-#             transform (callable, optional): Preprocessing wav
-#         """
-#         self.dataset_name = dataset_name
-#         self.datasets_root = datasets_root
-#         self.wav_preprocess = wav_preprocess
-#         self.mel2wav = mel2wav
 
 class LibriSpeechDataset(Dataset):
     def __init__(self, datasets_root, dataset_name, wav_preprocess=None, mel2wav = None):
@@ -29,11 +15,6 @@ class LibriSpeechDataset(Dataset):
         self.datasets_root = datasets_root
         self.wav_preprocess = wav_preprocess
         self.mel2wav = mel2wav
-
-
-
-
-
 
     def __len__(self):
         return len(self.landmarks_frame)
@@ -54,3 +35,19 @@ class LibriSpeechDataset(Dataset):
             sample = self.transform(sample)
 
         return sample
+
+
+# class SpeakerEncoderDataset(Dataset):
+#     """Speaker Encoder Dataset"""
+#
+#     def __init__(self, datasets_root, dataset_name, wav_preprocess=None, mel2wav = None):
+#         """
+#         Args:
+#             datasets_root (string): Path to the directory with datasets.
+#             dataset_name (string): dataset_name.
+#             transform (callable, optional): Preprocessing wav
+#         """
+#         self.dataset_name = dataset_name
+#         self.datasets_root = datasets_root
+#         self.wav_preprocess = wav_preprocess
+#         self.mel2wav = mel2wav

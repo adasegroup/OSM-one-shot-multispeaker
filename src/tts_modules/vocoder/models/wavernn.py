@@ -6,6 +6,9 @@ from tts_modules.vocoder.utils.distribution import sample_from_discretized_mix_l
 from tts_modules.vocoder.utils.audio import *
 import tts_modules.vocoder.configs.hparams as hp
 
+RAW = 'RAW'
+MOL = 'MOL'
+
 
 class ResBlock(nn.Module):
     def __init__(self, dims):
@@ -89,7 +92,7 @@ class UpsampleNetwork(nn.Module):
 class WaveRNN(nn.Module):
     def __init__(self, rnn_dims, fc_dims, bits, pad, upsample_factors,
                  feat_dims, compute_dims, res_out_dims, res_blocks,
-                 hop_length, sample_rate, mode='RAW'):
+                 hop_length, sample_rate, mode=RAW):
         super().__init__()
         if torch.cuda.is_available():
             self.device = torch.device("cuda")
@@ -97,9 +100,9 @@ class WaveRNN(nn.Module):
             self.device = torch.device("cpu")
         self.mode = mode
         self.pad = pad
-        if self.mode == 'RAW':
+        if self.mode == RAW:
             self.n_classes = 2 ** bits
-        elif self.mode == 'MOL':
+        elif self.mode == MOL:
             self.n_classes = 30
         else:
             RuntimeError("Unknown model mode value - ", self.mode)
@@ -156,7 +159,7 @@ class WaveRNN(nn.Module):
         return self.fc3(x)
 
     def generate(self, mels, batched, target, overlap, mu_law, progress_callback=None):
-        mu_law = mu_law if self.mode == 'RAW' else False
+        mu_law = mu_law if self.mode == RAW else False
 
         self.eval()
         output = []
@@ -164,10 +167,8 @@ class WaveRNN(nn.Module):
         rnn2 = self.get_gru_cell(self.rnn2)
 
         with torch.no_grad():
-            if torch.cuda.is_available():
-                mels = mels.cuda()
-            else:
-                mels = mels.cpu()
+            mels = mels.to(self.device)
+
             wave_len = (mels.size(-1) - 1) * self.hop_length
             mels = self.pad_tensor(mels.transpose(1, 2), pad=self.pad, side='both')
             mels, aux = self.upsample(mels.transpose(1, 2))
@@ -178,14 +179,9 @@ class WaveRNN(nn.Module):
 
             b_size, seq_len, _ = mels.size()
 
-            if torch.cuda.is_available():
-                h1 = torch.zeros(b_size, self.rnn_dims).cuda()
-                h2 = torch.zeros(b_size, self.rnn_dims).cuda()
-                x = torch.zeros(b_size, 1).cuda()
-            else:
-                h1 = torch.zeros(b_size, self.rnn_dims).cpu()
-                h2 = torch.zeros(b_size, self.rnn_dims).cpu()
-                x = torch.zeros(b_size, 1).cpu()
+            h1 = torch.zeros(b_size, self.rnn_dims).to(self.device)
+            h2 = torch.zeros(b_size, self.rnn_dims).to(self.device)
+            x = torch.zeros(b_size, 1).to(self.device)
 
             d = self.aux_dims
             aux_split = [aux[:, :, d * i:d * (i + 1)] for i in range(4)]
@@ -213,16 +209,16 @@ class WaveRNN(nn.Module):
 
                 logits = self.fc3(x)
 
-                if self.mode == 'MOL':
+                if self.mode == MOL:
                     sample = sample_from_discretized_mix_logistic(logits.unsqueeze(0).transpose(1, 2))
                     output.append(sample.view(-1))
                     if torch.cuda.is_available():
                         # x = torch.FloatTensor([[sample]]).cuda()
-                        x = sample.transpose(0, 1).cuda()
+                        x = sample.transpose(0, 1).to(self.device)
                     else:
                         x = sample.transpose(0, 1)
 
-                elif self.mode == 'RAW':
+                elif self.mode == RAW:
                     posterior = F.softmax(logits, dim=1)
                     distrib = torch.distributions.Categorical(posterior)
 
@@ -267,10 +263,9 @@ class WaveRNN(nn.Module):
         # i.e., it won't generalise to other shapes/dims
         b, t, c = x.size()
         total = t + 2 * pad if side == 'both' else t + pad
-        if torch.cuda.is_available():
-            padded = torch.zeros(b, total, c).cuda()
-        else:
-            padded = torch.zeros(b, total, c).cpu()
+
+        padded = torch.zeros(b, total, c).to(self.device)
+
         if side == 'before' or side == 'both':
             padded[:, pad:pad + t, :] = x
         elif side == 'after':
@@ -310,10 +305,7 @@ class WaveRNN(nn.Module):
             padding = target + 2 * overlap - remaining
             x = self.pad_tensor(x, padding, side='after')
 
-        if torch.cuda.is_available():
-            folded = torch.zeros(num_folds, target + 2 * overlap, features).cuda()
-        else:
-            folded = torch.zeros(num_folds, target + 2 * overlap, features).cpu()
+        folded = torch.zeros(num_folds, target + 2 * overlap, features).to(self.device)
 
         # Get the values for the folded tensor
         for i in range(num_folds):

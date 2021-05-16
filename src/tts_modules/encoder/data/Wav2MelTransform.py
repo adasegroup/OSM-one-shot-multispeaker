@@ -2,6 +2,7 @@ import yaml
 import numpy as np
 import librosa
 
+
 class Wav2MelTransform(object):
     """
     Interface for deriving a mel spectrogram ready to be used by the encoder from a preprocessed audio waveform.
@@ -24,6 +25,7 @@ class Wav2MelTransform(object):
         Note: this not a log-mel spectrogram.
         """
         pass
+
 
 class StandardWav2MelTransform(Wav2MelTransform):
     """
