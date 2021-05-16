@@ -5,7 +5,6 @@ from tts_modules.vocoder.vocoder_manager import VocoderManager
 import yaml
 
 
-
 class MultispeakerManager:
     def __init__(self, configs,
                  encoder=None, encoder_checkpoint_path=None,
@@ -16,8 +15,8 @@ class MultispeakerManager:
                  vocoder_test_dataloader=None, vocoder_train_dataloader=None):
         self.configs = configs
         self.encoder_manager = SpeakerEncoderManager(configs,
-                                              model=encoder,
-                                              checkpoint_path=self.configs["SPEAKER_ENCODER_CHECKPOINT_PATH"])
+                                                     model=encoder,
+                                                     checkpoint_path=self.configs["SPEAKER_ENCODER_CHECKPOINT_PATH"])
 
         self.synthesizer_manager = SynthesizerManager(configs,
                                                       model=synthesizer,
@@ -46,8 +45,8 @@ class MultispeakerManager:
     def process_speaker(self, speaker_speech_path, save_embeddings_path=None,
                         save_embeddings_speaker_name="test_speaker"):
         embeddings = self.encoder_manager.process_speaker(speaker_speech_path,
-                                                     save_embeddings_path=save_embeddings_path,
-                                                     save_embeddings_speaker_name=save_embeddings_speaker_name)
+                                                          save_embeddings_path=save_embeddings_path,
+                                                          save_embeddings_speaker_name=save_embeddings_speaker_name)
         return embeddings
 
     def synthesize_spectrograms(self, texts, embeddings, do_save_spectrograms=True):

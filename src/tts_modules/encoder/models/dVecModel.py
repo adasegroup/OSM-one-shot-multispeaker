@@ -23,6 +23,7 @@ import torch
 class DVecModel(nn.Module):
     def __init__(self, device, loss_device, params):
         super().__init__()
+        self.weight_download_url = "https://drive.google.com/uc?export=download&id=1oGQ_nHa-krc2ztBOU3ddgm8putpVNcdT"
         self.loss_device = loss_device
 
         # Network defition

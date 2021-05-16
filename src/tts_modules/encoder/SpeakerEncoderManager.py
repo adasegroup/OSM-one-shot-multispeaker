@@ -68,7 +68,7 @@ class SpeakerEncoderManager:
             self.device = torch.device("cpu")
         if model is None:
             self.__init_dvec_model()
-            self.__load_model()
+            self.__load_model(url=self.model.weight_download_url)
         self.model = self.model.to(self.device)
 
     def __init_dvec_model(self):
@@ -90,12 +90,16 @@ class SpeakerEncoderManager:
 
         return embed
 
-    def save_embeddings(self, save_embeddings_path,save_embeddings_speaker_name):
-        np.save(os.path.join(save_embeddings_path,save_embeddings_speaker_name), self.current_embed)
+    def save_embeddings(self, save_embeddings_path, save_embeddings_speaker_name):
+        np.save(os.path.join(save_embeddings_path, save_embeddings_speaker_name), self.current_embed)
 
-    def __load_model(self):
-        checkpoint = torch.load(self.checkpoint_path, map_location=self.device)
-        self.model.load_state_dict(checkpoint["model_state"])
+    def __load_model(self, url=None):
+        if url is not None:
+            checkpoint = torch.hub.load_state_dict_from_url(url)
+        else:
+            checkpoint = torch.load(self.checkpoint_path, map_location=self.device)
+        model_state_dict = checkpoint["model_state"] if "model_state" in checkpoint.keys() else checkpoint
+        self.model.load_state_dict(model_state_dict)
         self.model.eval()
 
     def embed_utterance(self, wav, using_partials=True, return_partials=False):
