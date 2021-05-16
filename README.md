@@ -38,6 +38,19 @@ Such approach will help us to create the convenient API for external users who w
 The API will also let the users customize modules and pipeline steps without changing the source code of the framework if needed. 
 We will implement several Speaker Encoders (LDE, TDNN) and add them to our framework as well.
 
+## Project Structure Overview
+From a high point, our project consists of 3 main elements: Speaker Encoder, Synthesizer, Vocoder. For each of them, a manager is implemented that allows one to access the parameters and perform standard actions such as inference. Above them, the we implemented OS MS TTS manager, which brings together all three parts  and allows one to make all pipeline and produce speech with needed voice. Each of these parts is also consist from elementary sub-parts typical for the corresponding elements. They can be described as follows:
+ - _Speaker Encoder_: Here the base class is SpeakerEncoderManager, which allows to train(next update) and inference model.Also, we have already  implemented the Wav Audio Preprocessing Interface. So, one can customize their own audio preprocessing functions, which can differ even for the same dataset. Also, the custom model can be used. We added standard preprocessing function and model presented in [Real-Time-Voice-Cloning](https://github.com/CorentinJ/Real-Time-Voice-Cloning "Real-Time-Voice-Cloning") 
+ - _Synthesizer_: Here the base class is SynthesizerManager, which allows to train(next update) and inference model. Also, the same sutiation with preprocessing functions, with one difference. In addition to the audio, one also need to process the text. For now, we only implemented text preprocessing function, as this only operation only needed during inference. Also, baseline from [Real-Time-Voice-Cloning](https://github.com/CorentinJ/Real-Time-Voice-Cloning "Real-Time-Voice-Cloning") 
+ - _Vocoder_: Here the base class is VocoderManager, which allows to train(next update) and inference model. Also, baseline from [Real-Time-Voice-Cloning](https://github.com/CorentinJ/Real-Time-Voice-Cloning "Real-Time-Voice-Cloning") 
+ 
+ ## Evaluation Results
+ In our repository we added notebook, where one can download the voice audio, .txt file and produce speech with cloned voice.
+ The weights can be dowloaded [here](https://github.com/blue-fish/Real-Time-Voice-Cloning/releases/download/v1.0/pretrained.zip "load weights")
+ Other instructions are in notebook [here](https://github.com/adasegroup/OSM-one-shot-multispeaker/blob/main/notebooks/demonstration.ipynb " notebook")
+ 
+
+
 ## Roles of the Participants
 Nikolay will design the modular architecture, API for external usage and training pipeline.
 Gleb will implement the working stack of models, write documentations and usage examples.
