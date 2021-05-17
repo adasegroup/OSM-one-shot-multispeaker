@@ -5,7 +5,7 @@ class TTSModuleManager:
     def __init__(self, configs, model=None, test_dataloader=None, train_dataloader=None):
         self.configs = configs
         self.model_config = None
-        self.__load_local_configs()
+        self._load_local_configs()
         self.test_dataloader = test_dataloader
         self.train_dataloader = train_dataloader
         self.model = model
@@ -15,7 +15,7 @@ class TTSModuleManager:
             self.device = torch.device("cpu")
         self.optimizer = None
         if self.model is None:
-            self.__init_baseline_model()
+            self._init_baseline_model()
 
     def load_model(self, url=None, verbose=True):
         if url is not None:
@@ -45,13 +45,13 @@ class TTSModuleManager:
         torch.save(state, path)
         return None
 
-    def __load_local_configs(self):
+    def _load_local_configs(self):
         """
             Load all necessary configs
         """
         raise NotImplementedError
 
-    def __init_baseline_model(self):
+    def _init_baseline_model(self):
         """
             Initialize baseline model
         """

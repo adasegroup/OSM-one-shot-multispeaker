@@ -43,11 +43,11 @@ class VocoderManager(TTSModuleManager):
             save_wav(wav, os.path.join(self.configs["OUTPUT_AUDIO_DIR"], 'result.wav'))
         return wav
 
-    def __load_local_configs(self):
+    def _load_local_configs(self):
         with open(self.configs["VocoderConfigPath"], "r") as ymlfile:
             self.model_config = yaml.load(ymlfile)
 
-    def __init_baseline_model(self):
+    def _init_baseline_model(self):
         self.model = WaveRNN(rnn_dims=hp.voc_rnn_dims,
                              fc_dims=hp.voc_fc_dims,
                              bits=hp.bits,

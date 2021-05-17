@@ -92,11 +92,11 @@ class SynthesizerManager(TTSModuleManager):
     def save_spectrograms(self, specs, alignments=None):
         pass
 
-    def __load_local_configs(self):
+    def _load_local_configs(self):
         with open(self.configs["SynthesizerConfigPath"], "r") as ymlfile:
             self.model_config = yaml.load(ymlfile)
 
-    def __init_baseline_model(self):
+    def _init_baseline_model(self):
         self.model = Tacotron(embed_dims=hparams.tts_embed_dims,
                               num_chars=len(symbols),
                               encoder_dims=hparams.tts_encoder_dims,

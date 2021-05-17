@@ -171,13 +171,13 @@ class SpeakerEncoderManager(TTSModuleManager):
 
         return wav_slices, mel_slices
 
-    def __load_local_configs(self):
+    def _load_local_configs(self):
         with open(self.configs["AudioConfigPath"], "r") as ymlfile:
             self.audio_config = yaml.load(ymlfile)
         with open(self.configs["SpeakerEncoderConfigPath"], "r") as ymlfile:
             self.model_config = yaml.load(ymlfile)
 
-    def __init_baseline_model(self):
+    def _init_baseline_model(self):
         self.model = DVecModel(self.device, self.device, self.model_config)
         if self.model_config["pretrained"]:
             self.load_model(url=self.model.get_download_url(), verbose=True)

@@ -7,6 +7,8 @@ torchvision
 torchtext
 torchaudio
 ipython
+ipywidgets
+IProgress
 librosa
 SoundFile
 inflect

@@ -91,7 +91,6 @@ class WaveRNN(nn.Module):
                  feat_dims, compute_dims, res_out_dims, res_blocks,
                  hop_length, sample_rate, device, mode='RAW'):
         super().__init__()
-        self.__weight_download_url = "https://drive.google.com/file/d/1zvEqkDePbS739c1MKisPZ1M32zLkIXum/view?usp=sharing"
         self.device = device
         self.mode = mode
         self.pad = pad
@@ -117,6 +116,9 @@ class WaveRNN(nn.Module):
 
         self.step = nn.Parameter(torch.zeros(1).long(), requires_grad=False)
         # self.num_params()
+        # self.__weight_download_url = "https://drive.google.com/uc?export=download&id=1zvEqkDePbS739c1MKisPZ1M32zLkIXum"
+        # self.__weight_download_url = "https://www.dropbox.com/s/l2wttvxzgacqos4/vocoder.pt"
+        self.__weight_download_url = None
 
     def forward(self, x, mels):
         self.step += 1

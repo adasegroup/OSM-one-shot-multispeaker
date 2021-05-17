@@ -40,6 +40,7 @@ class DVecModel(nn.Module):
 
         # Loss
         self.loss_fn = nn.CrossEntropyLoss().to(loss_device)
+        # self.__weight_download_url = "https://www.dropbox.com/s/3r3e07m1qxipo4g/encoder.pt"
         self.__weight_download_url = "https://drive.google.com/uc?export=download&id=1oGQ_nHa-krc2ztBOU3ddgm8putpVNcdT"
 
     def do_gradient_ops(self):

@@ -351,7 +351,9 @@ class Tacotron(nn.Module):
 
         self.register_buffer("step", torch.zeros(1, dtype=torch.long))
         self.register_buffer("stop_threshold", torch.tensor(stop_threshold, dtype=torch.float32))
-        self.__weight_download_url = "https://drive.google.com/uc?export=download&id=12c1qmUiRS-e8Lsnce6Yz2YPh31qWkdrO"
+        # self.__weight_download_url = "https://drive.google.com/u/0/uc?export=download&confirm=NKFz&id=12c1qmUiRS-e8Lsnce6Yz2YPh31qWkdrO"
+        # self.__weight_download_url = "https://www.dropbox.com/s/jh3o6f2kj3tirun/synthesizer.pt"
+        self.__weight_download_url = None
 
     @property
     def r(self):
