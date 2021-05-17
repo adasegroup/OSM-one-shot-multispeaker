@@ -351,6 +351,7 @@ class Tacotron(nn.Module):
 
         self.register_buffer("step", torch.zeros(1, dtype=torch.long))
         self.register_buffer("stop_threshold", torch.tensor(stop_threshold, dtype=torch.float32))
+        self.__weight_download_url = "https://drive.google.com/uc?export=download&id=12c1qmUiRS-e8Lsnce6Yz2YPh31qWkdrO"
 
     @property
     def r(self):
@@ -495,29 +496,16 @@ class Tacotron(nn.Module):
         with open(path, "a") as f:
             print(msg, file=f)
 
-    def load(self, path, optimizer=None):
-        # Use device of model params as location for loaded state
-        device = next(self.parameters()).device
-        checkpoint = torch.load(str(path), map_location=device)
-        self.load_state_dict(checkpoint["model_state"])
-
-        if "optimizer_state" in checkpoint and optimizer is not None:
-            optimizer.load_state_dict(checkpoint["optimizer_state"])
-
-    def save(self, path, optimizer=None):
-        if optimizer is not None:
-            torch.save({
-                "model_state": self.state_dict(),
-                "optimizer_state": optimizer.state_dict(),
-            }, str(path))
-        else:
-            torch.save({
-                "model_state": self.state_dict(),
-            }, str(path))
-
     def num_params(self, print_out=True):
         parameters = filter(lambda p: p.requires_grad, self.parameters())
         parameters = sum([np.prod(p.size()) for p in parameters]) / 1_000_000
         if print_out:
             print("Trainable Parameters: %.3fM" % parameters)
         return parameters
+
+    def get_download_url(self):
+        return self.__weight_download_url
+
+    def set_download_url(self, url):
+        self.__weight_download_url = url
+        return None

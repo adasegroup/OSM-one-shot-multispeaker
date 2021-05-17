@@ -1,3 +1,4 @@
+from tts_modules.ttt_module_manager import TTSModuleManager
 from tts_modules.encoder.models.dVecModel import DVecModel
 from tts_modules.encoder.data.WavPreprocessor import StandardAudioPreprocessor
 from tts_modules.encoder.data.Wav2MelTransform import StandardWav2MelTransform
@@ -8,7 +9,7 @@ import yaml
 import os
 
 
-class SpeakerEncoderManager:
+class SpeakerEncoderManager(TTSModuleManager):
     """Attributes
         ----------
         configs: dict
@@ -17,22 +18,21 @@ class SpeakerEncoderManager:
             preprocess wav audio
         wav2mel: Wav2MelTransform
             transfrom preprocessed wav to mel spectogram
-        checkpoint_path: str
-            path to checkpoint file
         current_embed: numpy.array
             the latest produced embedding
-        AudioConfig: dict
+        audio_config: dict
             Audio Configuration file
         device: int
-            Chosen GPU
+            Chosen device: GPU/CPU
         model : nn.Module
             Speaker Encoder NN model
         Methods
         -------
-        __init_dvec_model()
+        __init_baseline_model()
             initialize baseline model
-        __load_model()
-            load baseline checkpoint
+
+        load_model()
+            load model weights and optimizer if available
 
         process_speaker(speaker_speech_path, save_embeddings_path=None,
                         save_embeddings_speaker_name="test_speaker")
@@ -49,61 +49,42 @@ class SpeakerEncoderManager:
             partial utterances of <partial_utterance_n_frames> each.
 
         """
-    def __init__(self, configs, model, checkpoint_path,  preprocessor=None, wav2mel=None):
-        self.configs = configs
+    def __init__(self,
+                 configs,
+                 model=None,
+                 preprocessor=None,
+                 wav2mel=None,
+                 test_dataloader=None,
+                 train_dataloader=None
+                 ):
+        super(SpeakerEncoderManager, self).__init__(configs,
+                                                    model,
+                                                    test_dataloader,
+                                                    train_dataloader
+                                                    )
         self.preprocessor = preprocessor
         if preprocessor is None:
-            self.preprocessor = StandardAudioPreprocessor(configs["AudioConfig"])
+            self.preprocessor = StandardAudioPreprocessor(self.audio_config)
         self.wav2mel = wav2mel
         if wav2mel is None:
-            self.wav2mel = StandardWav2MelTransform(configs["AudioConfig"])
-
-        self.checkpoint_path = checkpoint_path
+            self.wav2mel = StandardWav2MelTransform(self.audio_config)
         self.current_embed = None
-        with open(configs["AudioConfig"], "r") as ymlfile:
-            self.AudioConfig = yaml.load(ymlfile)
-        if torch.cuda.is_available():
-            self.device = torch.device("cuda")
-        else:
-            self.device = torch.device("cpu")
-        if model is None:
-            self.__init_dvec_model()
-            self.__load_model(url=self.model.weight_download_url)
-        self.model = self.model.to(self.device)
-
-    def __init_dvec_model(self):
-        """ initialize baseline model"""
-        with open(self.configs["SpeakerEncoderConfig"], "r") as ymlfile:
-            self.SpeakerEncoderConfig = yaml.load(ymlfile)
-        self.model = DVecModel(self.device, self.device, self.SpeakerEncoderConfig)
 
     def process_speaker(self, speaker_speech_path, save_embeddings_path=None,
                         save_embeddings_speaker_name="test_speaker"):
-
         """ produce embeddings for one utterance"""
         processed_wav = self.preprocessor.preprocess_wav(speaker_speech_path)
-
         embed = self.embed_utterance(processed_wav)
         self.current_embed = embed
         if save_embeddings_path is not None:
-            self.save_embeddings(self, save_embeddings_path, save_embeddings_speaker_name)
+            self.save_embeddings(save_embeddings_path, save_embeddings_speaker_name)
 
         return embed
 
     def save_embeddings(self, save_embeddings_path, save_embeddings_speaker_name):
         np.save(os.path.join(save_embeddings_path, save_embeddings_speaker_name), self.current_embed)
 
-    def __load_model(self, url=None):
-        if url is not None:
-            checkpoint = torch.hub.load_state_dict_from_url(url)
-        else:
-            checkpoint = torch.load(self.checkpoint_path, map_location=self.device)
-        model_state_dict = checkpoint["model_state"] if "model_state" in checkpoint.keys() else checkpoint
-        self.model.load_state_dict(model_state_dict)
-        self.model.eval()
-
     def embed_utterance(self, wav, using_partials=True, return_partials=False):
-
         # Process the entire utterance if not using partials
         if not using_partials:
             # processed_wav = self.preprocessor.preprocess_wav(wav)
@@ -113,7 +94,6 @@ class SpeakerEncoderManager:
             self.current_embed = embed[0]
             if return_partials:
                 return embed[0], None, None
-
             return embed[0]
 
         # Compute where to split the utterance into partials and pad if necessary
@@ -162,10 +142,9 @@ class SpeakerEncoderManager:
         respectively the waveform and the mel spectrogram with these slices to obtain the partial
         utterances.
         """
-        config = self.AudioConfig
-        sampling_rate = config["SAMPLING_RATE"]
-        mel_window_step = config["MEL_WINDOW_STEP"]
-        partial_utterance_n_frames = config["PARTIAL_UTTERANCE_N_FRAMES"]
+        sampling_rate = self.audio_config["SAMPLING_RATE"]
+        mel_window_step = self.audio_config["MEL_WINDOW_STEP"]
+        partial_utterance_n_frames = self.audio_config["PARTIAL_UTTERANCE_N_FRAMES"]
 
         assert 0 <= overlap < 1
         assert 0 < min_pad_coverage <= 1
@@ -192,34 +171,14 @@ class SpeakerEncoderManager:
 
         return wav_slices, mel_slices
 
+    def __load_local_configs(self):
+        with open(self.configs["AudioConfigPath"], "r") as ymlfile:
+            self.audio_config = yaml.load(ymlfile)
+        with open(self.configs["SpeakerEncoderConfigPath"], "r") as ymlfile:
+            self.model_config = yaml.load(ymlfile)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def __init_baseline_model(self):
+        self.model = DVecModel(self.device, self.device, self.model_config)
+        if self.model_config["pretrained"]:
+            self.load_model(url=self.model.get_download_url(), verbose=True)
+        return None

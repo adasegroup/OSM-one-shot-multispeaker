@@ -1,34 +1,34 @@
 import torch
+from tts_modules.ttt_module_manager import TTSModuleManager
 from tts_modules.synthesizer.configs.hparams import hparams
 # from tts_modules.synthesizer.utils import audio
 from tts_modules.synthesizer.utils.symbols import symbols
 from tts_modules.synthesizer.utils.text import text_to_sequence
 from tts_modules.synthesizer.models.tacotron import Tacotron
-from pathlib import Path
 from typing import Union, List
 import numpy as np
-import librosa
+import yaml
 
 
-class SynthesizerManager:
-
-    def __init__(self, configs, test_dataloader=None, train_dataloader=None,
-                 model=None, checkpoint_path=None):
-        self.configs = configs
-        self.test_dataloader = test_dataloader
-        self.train_dataloader = train_dataloader
-        self.model = model
-        self.checkpoint_path = checkpoint_path
-        if torch.cuda.is_available():
-            self.device = torch.device("cuda")
-        else:
-            self.device = torch.device("cpu")
-
-        if self.model is None:
-            self.__init_tacotron()
+class SynthesizerManager(TTSModuleManager):
+    def __init__(self,
+                 configs,
+                 model=None,
+                 test_dataloader=None,
+                 train_dataloader=None
+                 ):
+        super(SynthesizerManager, self).__init__(configs,
+                                                 model,
+                                                 test_dataloader,
+                                                 train_dataloader
+                                                 )
 
     def __call__(self, *args, **kwargs):
         return self.synthesize_spectrograms(*args, **kwargs)
+
+    @staticmethod
+    def pad1d(x, max_len, pad_value=0):
+        return np.pad(x, (0, max_len - len(x)), mode="constant", constant_values=pad_value)
 
     def synthesize_spectrograms(self, texts: List[str],
                                 embeddings: Union[np.ndarray, List[np.ndarray]],
@@ -41,6 +41,7 @@ class SynthesizerManager:
         :param return_alignments: if True, a matrix representing the alignments between the
         characters
         and each decoder output step will be returned for each spectrogram
+        :param do_save_spectrograms: bool flag defines whether to save obtained spectrograms or not
         :return: a list of N melspectrograms as numpy arrays of shape (80, Mi), where Mi is the
         sequence length of spectrogram i, and possibly the alignments.
         """
@@ -91,11 +92,11 @@ class SynthesizerManager:
     def save_spectrograms(self, specs, alignments=None):
         pass
 
-    @staticmethod
-    def pad1d(x, max_len, pad_value=0):
-        return np.pad(x, (0, max_len - len(x)), mode="constant", constant_values=pad_value)
+    def __load_local_configs(self):
+        with open(self.configs["SynthesizerConfigPath"], "r") as ymlfile:
+            self.model_config = yaml.load(ymlfile)
 
-    def __init_tacotron(self):
+    def __init_baseline_model(self):
         self.model = Tacotron(embed_dims=hparams.tts_embed_dims,
                               num_chars=len(symbols),
                               encoder_dims=hparams.tts_encoder_dims,
@@ -111,15 +112,6 @@ class SynthesizerManager:
                               stop_threshold=hparams.tts_stop_threshold,
                               speaker_embedding_size=hparams.speaker_embedding_size
                               ).to(self.device)
-        if self.checkpoint_path is not None:
-            self.__load_model()
-        self.model.eval()
-
-    def __load_model(self):
-        if self.checkpoint_path is not None:
-            self.model.load(self.checkpoint_path)
-        else:
-            print('Synthesizer was not loaded!!!')
-
-    def __save_checkpoint(self, path):
-        pass
+        if self.model_config["pretrained"]:
+            self.load_model(self.model.get_download_url(), verbose=True)
+        return None

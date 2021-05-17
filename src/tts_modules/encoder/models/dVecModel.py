@@ -23,7 +23,6 @@ import torch
 class DVecModel(nn.Module):
     def __init__(self, device, loss_device, params):
         super().__init__()
-        self.weight_download_url = "https://drive.google.com/uc?export=download&id=1oGQ_nHa-krc2ztBOU3ddgm8putpVNcdT"
         self.loss_device = loss_device
 
         # Network defition
@@ -41,6 +40,7 @@ class DVecModel(nn.Module):
 
         # Loss
         self.loss_fn = nn.CrossEntropyLoss().to(loss_device)
+        self.__weight_download_url = "https://drive.google.com/uc?export=download&id=1oGQ_nHa-krc2ztBOU3ddgm8putpVNcdT"
 
     def do_gradient_ops(self):
         # Gradient scale
@@ -145,4 +145,9 @@ class DVecModel(nn.Module):
 
         return loss, eer
 
+    def get_download_url(self):
+        return self.__weight_download_url
 
+    def set_download_url(self, url):
+        self.__weight_download_url = url
+        return None

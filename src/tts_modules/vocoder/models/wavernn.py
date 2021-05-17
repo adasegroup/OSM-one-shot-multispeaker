@@ -89,12 +89,10 @@ class UpsampleNetwork(nn.Module):
 class WaveRNN(nn.Module):
     def __init__(self, rnn_dims, fc_dims, bits, pad, upsample_factors,
                  feat_dims, compute_dims, res_out_dims, res_blocks,
-                 hop_length, sample_rate, mode='RAW'):
+                 hop_length, sample_rate, device, mode='RAW'):
         super().__init__()
-        if torch.cuda.is_available():
-            self.device = torch.device("cuda")
-        else:
-            self.device = torch.device("cpu")
+        self.__weight_download_url = "https://drive.google.com/file/d/1zvEqkDePbS739c1MKisPZ1M32zLkIXum/view?usp=sharing"
+        self.device = device
         self.mode = mode
         self.pad = pad
         if self.mode == 'RAW':
@@ -324,29 +322,28 @@ class WaveRNN(nn.Module):
         return folded
 
     def xfade_and_unfold(self, y, target, overlap):
-
-        ''' Applies a crossfade and unfolds into a 1d array.
-        Args:
-            y (ndarry)    : Batched sequences of audio samples
-                            shape=(num_folds, target + 2 * overlap)
-                            dtype=np.float64
-            overlap (int) : Timesteps for both xfade and rnn warmup
-        Return:
-            (ndarry) : audio samples in a 1d array
-                       shape=(total_len)
-                       dtype=np.float64
-        Details:
-            y = [[seq1],
-                 [seq2],
-                 [seq3]]
-            Apply a gain envelope at both ends of the sequences
-            y = [[seq1_in, seq1_target, seq1_out],
-                 [seq2_in, seq2_target, seq2_out],
-                 [seq3_in, seq3_target, seq3_out]]
-            Stagger and add up the groups of samples:
-            [seq1_in, seq1_target, (seq1_out + seq2_in), seq2_target, ...]
-        '''
-
+        """
+            Applies a crossfade and unfolds into a 1d array.
+            Args:
+                y (ndarry)    : Batched sequences of audio samples
+                                shape=(num_folds, target + 2 * overlap)
+                                dtype=np.float64
+                overlap (int) : Timesteps for both xfade and rnn warmup
+            Return:
+                (ndarry) : audio samples in a 1d array
+                           shape=(total_len)
+                           dtype=np.float64
+            Details:
+                y = [[seq1],
+                     [seq2],
+                     [seq3]]
+                Apply a gain envelope at both ends of the sequences
+                y = [[seq1_in, seq1_target, seq1_out],
+                     [seq2_in, seq2_target, seq2_out],
+                     [seq3_in, seq3_target, seq3_out]]
+                Stagger and add up the groups of samples:
+                [seq1_in, seq1_target, (seq1_out + seq2_in), seq2_target, ...]
+        """
         num_folds, length = y.shape
         target = length - 2 * overlap
         total_len = num_folds * (target + overlap) + overlap
@@ -390,24 +387,15 @@ class WaveRNN(nn.Module):
         with open(path, 'a') as f:
             print(msg, file=f)
 
-    def load(self, path, optimizer=None):
-        checkpoint = torch.load(path, map_location=self.device)
-        if "optimizer_state" in checkpoint:
-            self.load_state_dict(checkpoint["model_state"])
-            if optimizer is not None:
-                optimizer.load_state_dict(checkpoint["optimizer_state"])
-        else:
-            # Backwards compatibility
-            self.load_state_dict(checkpoint)
-
-    def save(self, path, optimizer):
-        torch.save({
-            "model_state": self.state_dict(),
-            "optimizer_state": optimizer.state_dict(),
-        }, path)
-
     def num_params(self, print_out=True):
         parameters = filter(lambda p: p.requires_grad, self.parameters())
         parameters = sum([np.prod(p.size()) for p in parameters]) / 1_000_000
         if print_out:
             print('Trainable Parameters: %.3fM' % parameters)
+
+    def get_download_url(self):
+        return self.__weight_download_url
+
+    def set_download_url(self, url):
+        self.__weight_download_url = url
+        return None

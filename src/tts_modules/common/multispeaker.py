@@ -1,5 +1,5 @@
 import torch
-from tts_modules.encoder.SpeakerEncoderManager import SpeakerEncoderManager
+from tts_modules.encoder.speaker_encoder_manager import SpeakerEncoderManager
 from tts_modules.synthesizer.synthesizer_manager import SynthesizerManager
 from tts_modules.vocoder.vocoder_manager import VocoderManager
 import yaml
@@ -7,11 +7,11 @@ import yaml
 
 class MultispeakerManager:
     def __init__(self, configs,
-                 encoder=None, encoder_checkpoint_path=None,
+                 encoder=None,
                  encoder_test_dataloader=None, encoder_train_dataloader=None,
-                 synthesizer=None, synthesizer_checkpoint_path=None,
+                 synthesizer=None,
                  synthesizer_test_dataloader=None, synthesizer_train_dataloader=None,
-                 vocoder=None, vocoder_checkpoint_path=None,
+                 vocoder=None,
                  vocoder_test_dataloader=None, vocoder_train_dataloader=None):
         self.configs = configs
         self.encoder_manager = SpeakerEncoderManager(configs,
