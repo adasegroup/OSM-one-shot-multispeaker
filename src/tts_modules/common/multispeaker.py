@@ -16,18 +16,20 @@ class MultispeakerManager:
         self.configs = configs
         self.encoder_manager = SpeakerEncoderManager(configs,
                                                      model=encoder,
-                                                     checkpoint_path=self.configs["SPEAKER_ENCODER_CHECKPOINT_PATH"])
+                                                     test_dataloader=encoder_test_dataloader,
+                                                     train_dataloader=encoder_train_dataloader
+                                                     )
 
         self.synthesizer_manager = SynthesizerManager(configs,
                                                       model=synthesizer,
-                                                      checkpoint_path=self.configs["SYNTHESIZER_CHECKPOINT_PATH"],
                                                       test_dataloader=synthesizer_test_dataloader,
-                                                      train_dataloader=synthesizer_train_dataloader)
+                                                      train_dataloader=synthesizer_train_dataloader
+                                                      )
         self.vocoder_manager = VocoderManager(configs,
                                               model=vocoder,
-                                              checkpoint_path=self.configs["VOCODER_CHECKPOINT_PATH"],
                                               test_dataloader=vocoder_test_dataloader,
-                                              train_dataloader=vocoder_train_dataloader)
+                                              train_dataloader=vocoder_train_dataloader
+                                              )
         if torch.cuda.is_available():
             self.device = torch.device("cuda")
         else:
