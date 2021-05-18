@@ -1,7 +1,7 @@
 from tts_modules.ttt_module_manager import TTSModuleManager
 from tts_modules.encoder.models.dVecModel import DVecModel
-from tts_modules.encoder.data.WavPreprocessor import StandardAudioPreprocessor
-from tts_modules.encoder.data.Wav2MelTransform import StandardWav2MelTransform
+from tts_modules.encoder.data.wav_preprocessing import StandardAudioPreprocessor
+from tts_modules.encoder.data.wav2mel import StandardWav2MelTransform
 
 import torch
 import numpy as np
@@ -178,7 +178,8 @@ class SpeakerEncoderManager(TTSModuleManager):
             self.model_config = yaml.load(ymlfile)
 
     def _init_baseline_model(self):
+        self.model_name = "DVecModel"
         self.model = DVecModel(self.device, self.device, self.model_config)
         if self.model_config["pretrained"]:
-            self.load_model(url=self.model.get_download_url(), verbose=True)
+            self._load_baseline_model()
         return None

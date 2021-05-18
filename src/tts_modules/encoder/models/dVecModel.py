@@ -29,7 +29,8 @@ class DVecModel(nn.Module):
         self.lstm = nn.LSTM(input_size=params["MEL_N_CHANNELS"],
                             hidden_size=params["model_hidden_size"],
                             num_layers=params["model_num_layers"],
-                            batch_first=True).to(device)
+                            batch_first=True
+                            ).to(device)
         self.linear = nn.Linear(in_features=params["model_hidden_size"],
                                 out_features=params["model_embedding_size"]).to(device)
         self.relu = torch.nn.ReLU().to(device)
@@ -40,8 +41,8 @@ class DVecModel(nn.Module):
 
         # Loss
         self.loss_fn = nn.CrossEntropyLoss().to(loss_device)
-        # self.__weight_download_url = "https://www.dropbox.com/s/3r3e07m1qxipo4g/encoder.pt"
-        self.__weight_download_url = "https://drive.google.com/uc?export=download&id=1oGQ_nHa-krc2ztBOU3ddgm8putpVNcdT"
+        self.num_params(verbose=params["verbose"])
+        self.__weight_download_url = "https://www.dropbox.com/s/dl/3r3e07m1qxipo4g/encoder.pt"
 
     def do_gradient_ops(self):
         # Gradient scale
@@ -145,6 +146,13 @@ class DVecModel(nn.Module):
             eer = brentq(lambda x: 1. - x - interp1d(fpr, tpr)(x), 0., 1.)
 
         return loss, eer
+
+    def num_params(self, verbose=False):
+        parameters = filter(lambda p: p.requires_grad, self.parameters())
+        parameters = sum([np.prod(p.size()) for p in parameters]) / 1_000_000
+        if verbose:
+            print("Trainable Parameters in dVecModel: %.3fM" % parameters)
+        return parameters
 
     def get_download_url(self):
         return self.__weight_download_url

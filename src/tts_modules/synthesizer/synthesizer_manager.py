@@ -97,6 +97,7 @@ class SynthesizerManager(TTSModuleManager):
             self.model_config = yaml.load(ymlfile)
 
     def _init_baseline_model(self):
+        self.model_name = "Tacotron"
         self.model = Tacotron(embed_dims=hparams.tts_embed_dims,
                               num_chars=len(symbols),
                               encoder_dims=hparams.tts_encoder_dims,
@@ -110,8 +111,9 @@ class SynthesizerManager(TTSModuleManager):
                               num_highways=hparams.tts_num_highways,
                               dropout=hparams.tts_dropout,
                               stop_threshold=hparams.tts_stop_threshold,
-                              speaker_embedding_size=hparams.speaker_embedding_size
+                              speaker_embedding_size=hparams.speaker_embedding_size,
+                              verbose=self.model_config["verbose"]
                               ).to(self.device)
         if self.model_config["pretrained"]:
-            self.load_model(self.model.get_download_url(), verbose=True)
+            self._load_baseline_model()
         return None

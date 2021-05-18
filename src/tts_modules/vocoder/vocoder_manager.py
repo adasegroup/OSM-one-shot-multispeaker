@@ -48,6 +48,7 @@ class VocoderManager(TTSModuleManager):
             self.model_config = yaml.load(ymlfile)
 
     def _init_baseline_model(self):
+        self.model_name = "WaveRNN"
         self.model = WaveRNN(rnn_dims=hp.voc_rnn_dims,
                              fc_dims=hp.voc_fc_dims,
                              bits=hp.bits,
@@ -60,8 +61,9 @@ class VocoderManager(TTSModuleManager):
                              hop_length=hp.hop_length,
                              sample_rate=hp.sample_rate,
                              device=self.device,
-                             mode=hp.voc_mode
+                             mode=hp.voc_mode,
+                             verbose=self.model_config["verbose"]
                              ).to(self.device)
         if self.model_config["pretrained"]:
-            self.load_model(self.model.get_download_url(), verbose=True)
+            self._load_baseline_model()
         return None

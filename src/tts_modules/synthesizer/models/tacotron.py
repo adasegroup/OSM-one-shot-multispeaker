@@ -330,7 +330,7 @@ class Decoder(nn.Module):
 class Tacotron(nn.Module):
     def __init__(self, embed_dims, num_chars, encoder_dims, decoder_dims, n_mels,
                  fft_bins, postnet_dims, encoder_K, lstm_dims, postnet_K, num_highways,
-                 dropout, stop_threshold, speaker_embedding_size):
+                 dropout, stop_threshold, speaker_embedding_size, verbose=False):
         super().__init__()
         self.n_mels = n_mels
         self.lstm_dims = lstm_dims
@@ -347,13 +347,11 @@ class Tacotron(nn.Module):
         self.post_proj = nn.Linear(postnet_dims, fft_bins, bias=False)
 
         self.init_model()
-        self.num_params()
+        self.num_params(verbose=verbose)
 
         self.register_buffer("step", torch.zeros(1, dtype=torch.long))
         self.register_buffer("stop_threshold", torch.tensor(stop_threshold, dtype=torch.float32))
-        # self.__weight_download_url = "https://drive.google.com/u/0/uc?export=download&confirm=NKFz&id=12c1qmUiRS-e8Lsnce6Yz2YPh31qWkdrO"
-        # self.__weight_download_url = "https://www.dropbox.com/s/jh3o6f2kj3tirun/synthesizer.pt"
-        self.__weight_download_url = None
+        self.__weight_download_url = "https://www.dropbox.com/s/dl/jh3o6f2kj3tirun/synthesizer.pt"
 
     @property
     def r(self):
@@ -498,11 +496,11 @@ class Tacotron(nn.Module):
         with open(path, "a") as f:
             print(msg, file=f)
 
-    def num_params(self, print_out=True):
+    def num_params(self, verbose=False):
         parameters = filter(lambda p: p.requires_grad, self.parameters())
         parameters = sum([np.prod(p.size()) for p in parameters]) / 1_000_000
-        if print_out:
-            print("Trainable Parameters: %.3fM" % parameters)
+        if verbose:
+            print("Trainable Parameters in Tacotron: %.3fM" % parameters)
         return parameters
 
     def get_download_url(self):

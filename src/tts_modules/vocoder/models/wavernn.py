@@ -89,7 +89,7 @@ class UpsampleNetwork(nn.Module):
 class WaveRNN(nn.Module):
     def __init__(self, rnn_dims, fc_dims, bits, pad, upsample_factors,
                  feat_dims, compute_dims, res_out_dims, res_blocks,
-                 hop_length, sample_rate, device, mode='RAW'):
+                 hop_length, sample_rate, device, mode='RAW', verbose=False):
         super().__init__()
         self.device = device
         self.mode = mode
@@ -115,10 +115,8 @@ class WaveRNN(nn.Module):
         self.fc3 = nn.Linear(fc_dims, self.n_classes)
 
         self.step = nn.Parameter(torch.zeros(1).long(), requires_grad=False)
-        # self.num_params()
-        # self.__weight_download_url = "https://drive.google.com/uc?export=download&id=1zvEqkDePbS739c1MKisPZ1M32zLkIXum"
-        # self.__weight_download_url = "https://www.dropbox.com/s/l2wttvxzgacqos4/vocoder.pt"
-        self.__weight_download_url = None
+        self.num_params(verbose=verbose)
+        self.__weight_download_url = "https://www.dropbox.com/s/dl/l2wttvxzgacqos4/vocoder.pt"
 
     def forward(self, x, mels):
         self.step += 1
@@ -389,11 +387,11 @@ class WaveRNN(nn.Module):
         with open(path, 'a') as f:
             print(msg, file=f)
 
-    def num_params(self, print_out=True):
+    def num_params(self, verbose=False):
         parameters = filter(lambda p: p.requires_grad, self.parameters())
         parameters = sum([np.prod(p.size()) for p in parameters]) / 1_000_000
-        if print_out:
-            print('Trainable Parameters: %.3fM' % parameters)
+        if verbose:
+            print('Trainable Parameters in WaveRNN: %.3fM' % parameters)
 
     def get_download_url(self):
         return self.__weight_download_url
