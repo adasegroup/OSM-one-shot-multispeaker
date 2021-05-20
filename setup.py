@@ -22,14 +22,28 @@ def load_requirements(file_name):
         return [str(item.requirement) for item in requirements]
 
 
+def load_readme():
+    with open("README.md", 'r') as f:
+        long_description = f.read()
+    return long_description
+
+
 setup(
     name="osms",
     version="1.0.0",
     description="OSM: One-Shot Multi-speaker",
+    long_description=load_readme(),
     author="Nikolay Kozyrskiy, Gleb Balitskiy",
     author_email="nikolay.kozyrskiy@skoltech.ru",
     url="https://github.com/adasegroup/OSM-one-shot-multispeaker",
-    packages=find_packages(),
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
     license="MIT",
-    install_requires=load_requirements("requirements.txt")
+    install_requires=load_requirements("requirements.txt"),
+    python_requires=">=3.6"
 )
