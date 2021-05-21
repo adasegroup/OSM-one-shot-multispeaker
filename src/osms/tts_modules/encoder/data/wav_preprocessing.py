@@ -15,8 +15,8 @@ except:
 
 class WavPreprocessor:
     """Interface """
-    def __init__(self, audio_config):
-        self.audio_config = audio_config
+    def __init__(self, config):
+        self.config = config
 
     def __call__(self, *args, **kwargs):
         return self.preprocess_wav(*args, **kwargs)
@@ -26,8 +26,8 @@ class WavPreprocessor:
 
 
 class StandardAudioPreprocessor(WavPreprocessor):
-    def __init__(self, audio_config):
-        super(StandardAudioPreprocessor, self).__init__(audio_config)
+    def __init__(self, config):
+        super(StandardAudioPreprocessor, self).__init__(config)
 
     def trim_long_silences(self, wav):
         """
@@ -37,10 +37,10 @@ class StandardAudioPreprocessor(WavPreprocessor):
         :return: the same waveform with silences trimmed away (length <= original wav length)
         """
         int16_max = (2 ** 15) - 1
-        vad_window_length = self.audio_config["VAD_WINDOW_LENGTH"]
-        sampling_rate = self.audio_config["SAMPLING_RATE"]
-        vad_moving_average_width = self.audio_config["VAD_MOVING_AVERAGE_WIDTH"]
-        vad_max_silence_length = self.audio_config["VAD_MAX_SILENCE_LENGTH"]
+        vad_window_length = self.config.AUDIO.VAD_WINDOW_LENGTH
+        sampling_rate = self.config.AUDIO.SAMPLING_RATE
+        vad_moving_average_width = self.config.AUDIO.VAD_MOVING_AVERAGE_WIDTH
+        vad_max_silence_length = self.config.AUDIO.VAD_MAX_SILENCE_LENGTH
         # Compute the voice detection window size
 
         samples_per_window = (vad_window_length * sampling_rate) // 1000
@@ -99,8 +99,8 @@ class StandardAudioPreprocessor(WavPreprocessor):
         this argument will be ignored.
         """
 
-        sampling_rate = self.audio_config["SAMPLING_RATE"]
-        audio_norm_target_dBFS = self.audio_config["AUDIO_NORM_TARGET_dBFS"]
+        sampling_rate = self.config.AUDIO.SAMPLING_RATE
+        audio_norm_target_dBFS = self.config.AUDIO.AUDIO_NORM_TARGET_dBFS
         # Load the wav from disk if needed
 
         if isinstance(fpath_or_wav, str) or isinstance(fpath_or_wav, Path):

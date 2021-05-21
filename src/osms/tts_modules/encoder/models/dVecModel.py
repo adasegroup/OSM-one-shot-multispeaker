@@ -8,40 +8,32 @@ import numpy as np
 import torch
 
 
-# ## Model parameters
-# model_hidden_size = 256
-# model_embedding_size = 256
-# model_num_layers = 3
-#
-#
-# ## Training parameters
-# learning_rate_init = 1e-4
-# speakers_per_batch = 64
-# utterances_per_speaker = 10
+
 
 
 class DVecModel(nn.Module):
-    def __init__(self, device, loss_device, params):
+    def __init__(self, config):
         super().__init__()
-        self.loss_device = loss_device
-
+        self.loss_device = config.DEVICE
+        self.config = config
+        self.device = config.DEVICE
         # Network defition
-        self.lstm = nn.LSTM(input_size=params["MEL_N_CHANNELS"],
-                            hidden_size=params["model_hidden_size"],
-                            num_layers=params["model_num_layers"],
+        self.lstm = nn.LSTM(input_size=self.config.AUDIO.MEL_N_CHANNELS,
+                            hidden_size=self.config.MODEL.MODEL_HIDDEN_SIZE,
+                            num_layers=self.config.MODEL.MODEL_NUM_LAYERS,
                             batch_first=True
-                            ).to(device)
-        self.linear = nn.Linear(in_features=params["model_hidden_size"],
-                                out_features=params["model_embedding_size"]).to(device)
-        self.relu = torch.nn.ReLU().to(device)
+                            ).to(self.device)
+        self.linear = nn.Linear(in_features=self.config.MODEL.MODEL_HIDDEN_SIZE,
+                                out_features=self.config.MODEL.MODEL_EMBEDDING_SIZE).to(self.device)
+        self.relu = torch.nn.ReLU().to(self.device)
 
         # Cosine similarity scaling (with fixed initial parameter values)
-        self.similarity_weight = nn.Parameter(torch.tensor([10.])).to(loss_device)
-        self.similarity_bias = nn.Parameter(torch.tensor([-5.])).to(loss_device)
+        self.similarity_weight = nn.Parameter(torch.tensor([10.])).to(self.loss_device)
+        self.similarity_bias = nn.Parameter(torch.tensor([-5.])).to(self.loss_device)
 
         # Loss
-        self.loss_fn = nn.CrossEntropyLoss().to(loss_device)
-        self.num_params(verbose=params["verbose"])
+        self.loss_fn = nn.CrossEntropyLoss().to(self.loss_device)
+        self.num_params(verbose=self.VERBOSE)
         self.__weight_download_url = "https://www.dropbox.com/s/dl/3r3e07m1qxipo4g/encoder.pt"
 
     def do_gradient_ops(self):

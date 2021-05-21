@@ -3,11 +3,11 @@ import os
 
 
 class SpeakerEncoderTrainer:
-    def __init__(self, config, model, train_dataloader, val_loader, optimizer):
+    def __init__(self, config, model, train_dataloader, test_loader, optimizer):
         self.config = config
         self.model = model
         self.train_dataloader = train_dataloader
-        self.val_loader = val_loader
+        self.test_loader = test_loader
         self.optimizer = optimizer
         self.device = config.DEVICE
         self.number_steps = self.config.TRAIN.NUMBER_STEPS

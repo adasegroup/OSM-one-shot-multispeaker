@@ -4,7 +4,7 @@ import os
 
 
 class AbstractTTSModuleManager:
-    def __init__(self, main_configs, model=None, test_dataloader=None, train_dataloader=None):
+    def __init__(self, main_configs, model=None, test_dataloader=None, train_dataloader=None, optimizer=None):
         self.main_configs = main_configs
         self.module_configs = None
         self.model_name = None
@@ -16,7 +16,7 @@ class AbstractTTSModuleManager:
             self.device = torch.device("cuda")
         else:
             self.device = torch.device("cpu")
-        self.optimizer = None
+        self.optimizer = optimizer
         if self.model is None:
             self._init_baseline_model()
 

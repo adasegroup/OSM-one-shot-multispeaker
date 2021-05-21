@@ -4,7 +4,8 @@ from .data.wav_preprocessing import StandardAudioPreprocessor
 from .data.wav2mel import StandardWav2MelTransform
 from .configs import get_default_encoder_config
 from osms.common.configs import update_config
-
+from .utils.Trainer import SpeakerEncoderTrainer
+from .data.dataset import PreprocessLibriSpeechDataset, SpeakerEncoderDataset, SpeakerEncoderDataLoader
 import torch
 import numpy as np
 import os
@@ -63,13 +64,38 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
                                                     test_dataloader,
                                                     train_dataloader
                                                     )
-        self.preprocessor = preprocessor
         if preprocessor is None:
-            self.preprocessor = StandardAudioPreprocessor(self.audio_config)
-        self.wav2mel = wav2mel
+            self.preprocessor = StandardAudioPreprocessor(self.module_configs)
+        else:
+            self.preprocessor = preprocessor
+
         if wav2mel is None:
-            self.wav2mel = StandardWav2MelTransform(self.audio_config)
+            self.wav2mel = StandardWav2MelTransform(self.module_configs)
+        else:
+            self.wav2mel = wav2mel
+
         self.current_embed = None
+        self.trainer = None
+        self.dataset = None
+
+    def init_trainer(self):
+        if self.train_dataloader is None:
+            dataset_preprocessor = PreprocessLibriSpeechDataset(self.module_configs, self.preprocessor, self.wav2mel)
+            dataset_preprocessor.preprocess_dataset()
+            train_dataset = SpeakerEncoderDataset(self.module_configs)
+            self.train_dataloader = SpeakerEncoderDataLoader(self.module_configs, train_dataset, 'train')
+        if self.test_dataloader is None:
+            dataset_preprocessor = PreprocessLibriSpeechDataset(self.module_configs, self.preprocessor, self.wav2mel)
+            dataset_preprocessor.preprocess_dataset()
+            train_dataset = SpeakerEncoderDataset(self.module_configs)
+            self.train_dataloader = SpeakerEncoderDataLoader(self.module_configs, train_dataset, 'train')
+
+
+        self.trainer = SpeakerEncoderTrainer(self.module_configs, self.model, self.train_dataloader,
+                                             self.test_dataloader, self.optimizer)
+
+
+
 
     def process_speaker(self, speaker_speech_path, save_embeddings_path=None,
                         save_embeddings_speaker_name="test_speaker"):
@@ -81,6 +107,31 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
             self.save_embeddings(save_embeddings_path, save_embeddings_speaker_name)
 
         return embed
+
+
+
+    # TODO: Correct config loading
+    def _load_local_configs(self):
+        self.module_configs = get_default_encoder_config()
+        self.module_configs = update_config(self.module_configs,
+                                            update_file=self.main_configs.SPEAKER_ENCODER_CONFIG_FILE
+                                            )
+        # if "AudioConfigPath" in self.main_configs.keys():
+        #     audio_config_path = self.main_configs["AudioConfigPath"]
+        # else:
+        #     audio_config_path = "./"
+        # with open(audio_config_path, "r") as ymlfile:
+        #     self.audio_config = yaml.load(ymlfile)
+        # with open(self.main_configs["SpeakerEncoderConfigPath"], "r") as ymlfile:
+        #     self.module_configs = yaml.load(ymlfile)
+        return None
+
+    def _init_baseline_model(self):
+        self.model_name = "DVecModel"
+        self.model = DVecModel(self.device, self.device, self.module_configs)
+        if self.module_configs.MODEL.PRETRAINED:
+            self._load_baseline_model()
+        return None
 
     def save_embeddings(self, save_embeddings_path, save_embeddings_speaker_name):
         np.save(os.path.join(save_embeddings_path, save_embeddings_speaker_name), self.current_embed)
@@ -171,26 +222,3 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
             wav_slices = wav_slices[:-1]
 
         return wav_slices, mel_slices
-
-    # TODO: Correct config loading
-    def _load_local_configs(self):
-        self.module_configs = get_default_encoder_config()
-        self.module_configs = update_config(self.module_configs,
-                                            update_file=self.main_configs.SPEAKER_ENCODER_CONFIG_FILE
-                                            )
-        # if "AudioConfigPath" in self.main_configs.keys():
-        #     audio_config_path = self.main_configs["AudioConfigPath"]
-        # else:
-        #     audio_config_path = "./"
-        # with open(audio_config_path, "r") as ymlfile:
-        #     self.audio_config = yaml.load(ymlfile)
-        # with open(self.main_configs["SpeakerEncoderConfigPath"], "r") as ymlfile:
-        #     self.module_configs = yaml.load(ymlfile)
-        return None
-
-    def _init_baseline_model(self):
-        self.model_name = "DVecModel"
-        self.model = DVecModel(self.device, self.device, self.module_configs)
-        if self.module_configs.MODEL.PRETRAINED:
-            self._load_baseline_model()
-        return None

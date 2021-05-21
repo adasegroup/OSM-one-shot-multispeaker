@@ -6,12 +6,12 @@ class Wav2MelTransform:
     """
     Interface for deriving a mel spectrogram ready to be used by the encoder from a preprocessed audio waveform.
     """
-    def __init__(self, audio_config):
+    def __init__(self, config):
         """
         attributes:
             audio_config - Audio Configuration file
         """
-        self.audio_config = audio_config
+        self.config = config
 
     def __call__(self, *args, **kwargs):
         return self.wav_to_mel(*args, **kwargs)
@@ -28,18 +28,18 @@ class StandardWav2MelTransform(Wav2MelTransform):
     """
     Standard wav to mel spectogram tranformer (baseline)
     """
-    def __init__(self, audio_config):
-        super(StandardWav2MelTransform, self).__init__(audio_config)
+    def __init__(self, config):
+        super(StandardWav2MelTransform, self).__init__(config)
 
     def wav_to_mel(self, wav):
         """
         Derives a mel spectrogram ready to be used by the encoder from a preprocessed audio waveform
         using Librosa implementation.
         """
-        sampling_rate = self.audio_config["SAMPLING_RATE"]
-        mel_window_length = self.audio_config["MEL_WINDOW_LENGTH"]
-        mel_window_step = self.audio_config["MEL_WINDOW_STEP"]
-        mel_n_channels = self.audio_config["MEL_N_CHANNELS"]
+        sampling_rate = self.config.AUDIO.SAMPLING_RATE
+        mel_window_length = self.config.AUDIO.MEL_WINDOW_LENGTH
+        mel_window_step = self.config.AUDIO.MEL_WINDOW_STEP
+        mel_n_channels = self.config.AUDIO.MEL_N_CHANNELS
         frames = librosa.feature.melspectrogram(
             wav,
             sampling_rate,
