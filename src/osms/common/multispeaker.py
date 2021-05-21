@@ -1,17 +1,22 @@
 import torch
-from ..encoder import SpeakerEncoderManager
-from ..synthesizer import SynthesizerManager
-from ..vocoder import VocoderManager
+from ..tts_modules.encoder import SpeakerEncoderManager
+from ..tts_modules.synthesizer import SynthesizerManager
+from ..tts_modules.vocoder import VocoderManager
 
 
 class MultispeakerManager:
-    def __init__(self, configs,
+    def __init__(self,
+                 configs,
                  encoder=None,
-                 encoder_test_dataloader=None, encoder_train_dataloader=None,
+                 encoder_test_dataloader=None,
+                 encoder_train_dataloader=None,
                  synthesizer=None,
-                 synthesizer_test_dataloader=None, synthesizer_train_dataloader=None,
+                 synthesizer_test_dataloader=None,
+                 synthesizer_train_dataloader=None,
                  vocoder=None,
-                 vocoder_test_dataloader=None, vocoder_train_dataloader=None):
+                 vocoder_test_dataloader=None,
+                 vocoder_train_dataloader=None
+                 ):
         self.configs = configs
         self.encoder_manager = SpeakerEncoderManager(configs,
                                                      model=encoder,
@@ -47,19 +52,24 @@ class MultispeakerManager:
                         save_embeddings_speaker_name="test_speaker"):
         embeddings = self.encoder_manager.process_speaker(speaker_speech_path,
                                                           save_embeddings_path=save_embeddings_path,
-                                                          save_embeddings_speaker_name=save_embeddings_speaker_name)
+                                                          save_embeddings_speaker_name=save_embeddings_speaker_name
+                                                          )
         return embeddings
 
     def synthesize_spectrograms(self, texts, embeddings, do_save_spectrograms=True):
-        specs = self.synthesizer_manager.synthesize_spectrograms(texts, embeddings,
-                                                                 do_save_spectrograms=do_save_spectrograms)
+        specs = self.synthesizer_manager.synthesize_spectrograms(texts,
+                                                                 embeddings,
+                                                                 do_save_spectrograms=do_save_spectrograms
+                                                                 )
         return specs
 
     def generate_waveform(self, mel, normalize=True, batched=True,
                           target=8000, overlap=800, do_save_wav=True):
-        wav = self.vocoder_manager.infer_waveform(mel, normalize=normalize,
+        wav = self.vocoder_manager.infer_waveform(mel,
+                                                  normalize=normalize,
                                                   batched=batched,
                                                   target=target,
                                                   overlap=overlap,
-                                                  do_save_wav=do_save_wav)
+                                                  do_save_wav=do_save_wav
+                                                  )
         return wav

@@ -1,1 +1,1 @@
-from .tts_modules.common.multispeaker import MultispeakerManager
+from .common.multispeaker import MultispeakerManager

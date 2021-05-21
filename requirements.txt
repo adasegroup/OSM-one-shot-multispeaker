@@ -13,6 +13,7 @@ librosa
 SoundFile
 inflect
 PyYAML
+yacs
 notebook
 unidecode
 webrtcvad-wheels

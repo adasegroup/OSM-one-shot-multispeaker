@@ -171,8 +171,13 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
 
         return wav_slices, mel_slices
 
+    # TODO: Correct config loading
     def _load_local_configs(self):
-        with open(self.configs["AudioConfigPath"], "r") as ymlfile:
+        if "AudioConfigPath" in self.configs.keys():
+            audio_config_path = self.configs["AudioConfigPath"]
+        else:
+            audio_config_path = "./"
+        with open(audio_config_path, "r") as ymlfile:
             self.audio_config = yaml.load(ymlfile)
         with open(self.configs["SpeakerEncoderConfigPath"], "r") as ymlfile:
             self.model_config = yaml.load(ymlfile)

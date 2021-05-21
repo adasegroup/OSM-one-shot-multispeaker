@@ -7,7 +7,7 @@ from . import MultispeakerManager
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("main_config_path", type=str,
-                        default='tts_modules/common/configs/main_config.yaml',
+                        default='./common/configs/main_config.yaml',
                         help='Path to main yaml configs')
     args = parser.parse_args()
 
