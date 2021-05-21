@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from yacs.config import CfgNode as CN
 import os
 
@@ -44,7 +40,6 @@ def get_default_encoder_config():
     _C.TRAIN.SAVE_N_STEPS = 5
     _C.TRAIN.OUT_DIR = os.path.join("data_path")
     _C.TRAIN.RUN_ID = "EXP_1"
-
 
     _C.VALIDATE = CN()
     _C.VALIDATE.SPEAKERS_PER_BATCH = 64

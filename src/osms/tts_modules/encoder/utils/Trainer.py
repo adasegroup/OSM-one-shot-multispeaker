@@ -3,6 +3,7 @@ from pathlib import Path
 import torch
 import os
 
+
 class SpeakerEncoderTrainer:
     def __init__(self, config, model, train_dataloader, val_loader, optimizer):
         self.config = config
