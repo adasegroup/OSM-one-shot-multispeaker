@@ -97,9 +97,13 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
         self.trainer = SpeakerEncoderTrainer(self.module_configs, self.model, self.train_dataloader,
                                              self.test_dataloader, self.optimizer)
 
-    def train_session(self, number_step):
+    def train_session(self, number_steps=None):
         self.__init_trainer()
-        self.trainer.train(number_step)
+        if number_steps is None:
+            self.trainer.train(self.module_configs.TRAIN.NUMBER_STEPS)
+        else:
+            self.trainer.train(number_steps)
+
 
 
 
