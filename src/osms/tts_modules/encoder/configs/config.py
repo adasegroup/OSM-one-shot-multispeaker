@@ -5,7 +5,7 @@ import os
 def get_default_encoder_config():
     _C = CN()
     _C.VERBOSE = True
-    _C.DEVICE = 0
+    _C.DEVICE = 'cpu'
 
     _C.AUDIO = CN()
     _C.AUDIO.MEL_N_CHANNELS = 40
@@ -27,8 +27,8 @@ def get_default_encoder_config():
     _C.MODEL.MODEL_NUM_LAYERS = 3
 
     _C.DATASET = CN()
-    _C.DATASET.ROOT = os.path.join("dataset_path")
-    _C.DATASET.OUTPUT_DIR = os.path.join("output_path")
+    _C.DATASET.ROOT = "/Users/gleb/Documents/LibriSpeech/test-clean"
+    _C.DATASET.OUTPUT_DIR = "/Users/gleb/Documents/LibriSpeech/output"
     _C.DATASET.EXTENSION = "flac"
 
     _C.TRAIN = CN()
@@ -38,7 +38,7 @@ def get_default_encoder_config():
     _C.TRAIN.NUMBER_STEPS = 1000
     _C.TRAIN.CHECKPOINT_NAME = None
     _C.TRAIN.SAVE_N_STEPS = 5
-    _C.TRAIN.OUT_DIR = os.path.join("data_path")
+    _C.TRAIN.OUT_DIR = "/Users/gleb/Documents/TRAIN_OUTPUT"
     _C.TRAIN.RUN_ID = "EXP_1"
 
     _C.VALIDATE = CN()

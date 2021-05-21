@@ -1,15 +1,15 @@
 from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, utils
 from typing import List
 import numpy as np
 from .DataObjects import Speaker, RandomCycler, SpeakerBatch
-
+from pathlib import Path
 
 class PreprocessDataset:
     def __init__(self, config, wav_preprocessor, wav2mel_transformer):
         self.config = config
-        self.dataset_root = config.DATASET.ROOT
-        self.output_dir = config.DATASET.OUTPUT_DIR
+        self.dataset_root = Path(config.DATASET.ROOT)
+        self.output_dir = Path(config.DATASET.OUTPUT_DIR)
+        self.output_dir.mkdir(exist_ok=True)
         self.speaker_dirs = list(self.dataset_root.glob("*"))
         self.extension = config.DATASET.EXTENSION
         self.wav_preprocessor = wav_preprocessor
@@ -22,26 +22,28 @@ class PreprocessDataset:
         raise NotImplementedError
 
     def preprocess_dataset(self):
+        print(self.speaker_dirs)
         for speaker_dir in self.speaker_dirs:
             speaker_name = "_".join(speaker_dir.relative_to(self.dataset_root).parts)
             speaker_out_dir = self.output_dir.joinpath(speaker_name)
             speaker_out_dir.mkdir(exist_ok=True)
             sources_fpath = speaker_out_dir.joinpath("_sources.txt")
-
+            sources_file = sources_fpath.open("w")
             for in_fpath in self.process_paths_to_speaker_utterances(speaker_dir):
+
                 out_mel_fpath = "_".join(in_fpath.relative_to(speaker_dir).parts)
-                out_mel_fpath.replace(".%s" % self.extension, ".npy")
+                out_mel_fpath = out_mel_fpath.replace(".%s" % self.extension, ".npy")
                 out_mel_fpath = speaker_out_dir.joinpath(out_mel_fpath)
 
-                sources_file = sources_fpath.open("w")
+
                 self.preprocess_speaker_one_utterance(in_fpath, sources_file, out_mel_fpath)
-                sources_file.close()
+            sources_file.close()
 
 
 class PreprocessLibriSpeechDataset(PreprocessDataset):
 
     def __init__(self, config, wav_preprocessor, wav2mel_transformer):
-        super(PreprocessDataset, self).__init__(config, wav_preprocessor, wav2mel_transformer)
+        super(PreprocessLibriSpeechDataset, self).__init__(config, wav_preprocessor, wav2mel_transformer)
 
     def process_paths_to_speaker_utterances(self, speaker_dir):
         return speaker_dir.glob("**/*.%s" % self.extension)
@@ -63,8 +65,8 @@ class PreprocessLibriSpeechDataset(PreprocessDataset):
 class SpeakerEncoderDataset(Dataset):
     def __init__(self, config):
         self.config = config
-        self.dataset_root = config.DATASET.ROOT
-        speaker_dirs = [f for f in self.dataset_root.glob("*") if f.is_dir()]
+        self.processed_dataset_root = Path(config.DATASET.ROOT).joinpath(config.DATASET.OUTPUT_DIR)
+        speaker_dirs = [f for f in self.processed_dataset_root.glob("[!.]*") if f.is_dir()]
         if len(speaker_dirs) == 0:
             raise Exception("No speakers found. Make sure you are pointing to the directory "
                             "containing all preprocessed speaker directories.")
@@ -83,12 +85,13 @@ class SpeakerEncoderDataLoader(DataLoader):
                  batch_sampler=None, num_workers=0, pin_memory=False, timeout=0,
                  worker_init_fn=None):
         self.dataset = dataset
+        self.config = config
         if mode == "train":
             self.speakers_per_batch = config.TRAIN.SPEAKERS_PER_BATCH
-            self.utterances_per_speaker = config.TRAIN.UTTERANCE_PER_SPEAKER
+            self.utterances_per_speaker = config.TRAIN.UTTERANCES_PER_SPEAKER
         if mode == "validate":
             self.speakers_per_batch = config.VALIDATE.SPEAKERS_PER_BATCH
-            self.utterances_per_speaker = config.VALIDATE.UTTERANCE_PER_SPEAKER
+            self.utterances_per_speaker = config.VALIDATE.UTTERANCES_PER_SPEAKER
 
         super().__init__(
             dataset=dataset,
