@@ -2,17 +2,18 @@ from .. import AbstractTTSModuleManager
 from .models import DVecModel
 from .data.wav_preprocessing import StandardAudioPreprocessor
 from .data.wav2mel import StandardWav2MelTransform
+from .configs import get_default_encoder_config
+from osms.common.configs import update_config
 
 import torch
 import numpy as np
-import yaml
 import os
 
 
 class SpeakerEncoderManager(AbstractTTSModuleManager):
     """Attributes
         ----------
-        configs: dict
+        main_configs: dict
             dictionary of configuration files
         preprocessor: AudioPreprocessor
             preprocess wav audio
@@ -50,14 +51,14 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
 
         """
     def __init__(self,
-                 configs,
+                 main_configs,
                  model=None,
                  preprocessor=None,
                  wav2mel=None,
                  test_dataloader=None,
                  train_dataloader=None
                  ):
-        super(SpeakerEncoderManager, self).__init__(configs,
+        super(SpeakerEncoderManager, self).__init__(main_configs,
                                                     model,
                                                     test_dataloader,
                                                     train_dataloader
@@ -173,18 +174,23 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
 
     # TODO: Correct config loading
     def _load_local_configs(self):
-        if "AudioConfigPath" in self.configs.keys():
-            audio_config_path = self.configs["AudioConfigPath"]
-        else:
-            audio_config_path = "./"
-        with open(audio_config_path, "r") as ymlfile:
-            self.audio_config = yaml.load(ymlfile)
-        with open(self.configs["SpeakerEncoderConfigPath"], "r") as ymlfile:
-            self.model_config = yaml.load(ymlfile)
+        self.module_configs = get_default_encoder_config()
+        self.module_configs = update_config(self.module_configs,
+                                            update_file=self.main_configs.SPEAKER_ENCODER_CONFIG_FILE
+                                            )
+        # if "AudioConfigPath" in self.main_configs.keys():
+        #     audio_config_path = self.main_configs["AudioConfigPath"]
+        # else:
+        #     audio_config_path = "./"
+        # with open(audio_config_path, "r") as ymlfile:
+        #     self.audio_config = yaml.load(ymlfile)
+        # with open(self.main_configs["SpeakerEncoderConfigPath"], "r") as ymlfile:
+        #     self.module_configs = yaml.load(ymlfile)
+        return None
 
     def _init_baseline_model(self):
         self.model_name = "DVecModel"
-        self.model = DVecModel(self.device, self.device, self.model_config)
-        if self.model_config["pretrained"]:
+        self.model = DVecModel(self.device, self.device, self.module_configs)
+        if self.module_configs.MODEL.PRETRAINED:
             self._load_baseline_model()
         return None

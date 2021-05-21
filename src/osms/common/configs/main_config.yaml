@@ -1,9 +1,9 @@
-AudioConfigPath: "osms/tts_modules/encoder/configs/AudioConfig.yaml"
-SpeakerEncoderConfigPath: "osms/tts_modules/encoder/configs/dVecModelConfig.yaml"
+AudioConfigPath: "osms/tts_modules/encoder/main_configs/AudioConfig.yaml"
+SpeakerEncoderConfigPath: "osms/tts_modules/encoder/main_configs/dVecModelConfig.yaml"
 
-SynthesizerConfigPath: "osms/tts_modules/synthesizer/configs/tacotron_config.yaml"
+SynthesizerConfigPath: "osms/tts_modules/synthesizer/main_configs/tacotron_config.yaml"
 
-VocoderConfigPath: "osms/tts_modules/vocoder/configs/wavernn_config.yaml"
+VocoderConfigPath: "osms/tts_modules/vocoder/main_configs/wavernn_config.yaml"
 
 SPEAKER_ENCODER_CHECKPOINT_PATH: "osms/tts_modules/encoder/models/pretrained.pt"
 SYNTHESIZER_CHECKPOINT_PATH: "osms/tts_modules/synthesizer/models/pretrained.pt"

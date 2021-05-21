@@ -7,8 +7,8 @@ from . import MultispeakerManager
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("main_config_path", type=str,
-                        default='./common/configs/main_config.yaml',
-                        help='Path to main yaml configs')
+                        default='./common/main_configs/main_config.yaml',
+                        help='Path to main yaml main_configs')
     args = parser.parse_args()
 
     with open(args.main_config_path, "r") as ymlfile:

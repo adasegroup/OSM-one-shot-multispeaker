@@ -7,10 +7,10 @@ def get_default_vocoder_config():
     _C = CN()
     _C.VERBOSE = True
 
-    # Add Signal Processing configs (used in both synthesizer and vocoder)
+    # Add Signal Processing main_configs (used in both synthesizer and vocoder)
     _C = _add_default_signal_processing_config(_C, freeze=False)
 
-    # Add WaveRNN model configs
+    # Add WaveRNN model main_configs
     _C = _add_default_wavernn_config(_C, freeze=False)
 
     _C.freeze()
@@ -22,6 +22,8 @@ def _add_default_wavernn_config(config, freeze=True):
         config.defrost()
 
     config.MODEL = CN()
+    config.MODEL.PRETRAINED = True
+    config.MODEL.CHECKPOINT_DIR_PATH = os.path.join("checkpoints", "vocoder")
     # either 'RAW' (softmax on raw bits) or 'MOL' (sample from mixture of logistics)
     config.MODEL.MODE = "RAW"
     # NB - this needs to correctly factorise hop_length

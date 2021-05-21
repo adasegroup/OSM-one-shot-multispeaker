@@ -9,12 +9,12 @@ import yaml
 
 class VocoderManager(AbstractTTSModuleManager):
     def __init__(self,
-                 configs,
+                 main_configs,
                  model=None,
                  test_dataloader=None,
                  train_dataloader=None
                  ):
-        super(VocoderManager, self).__init__(configs,
+        super(VocoderManager, self).__init__(main_configs,
                                              model,
                                              test_dataloader,
                                              train_dataloader
@@ -40,11 +40,11 @@ class VocoderManager(AbstractTTSModuleManager):
         mel = torch.from_numpy(mel[None, ...])
         wav = self.model.generate(mel, batched, target, overlap, hp.mu_law)
         if do_save_wav:
-            save_wav(wav, os.path.join(self.configs["OUTPUT_AUDIO_DIR"], 'result.wav'))
+            save_wav(wav, os.path.join(self.main_configs["OUTPUT_AUDIO_DIR"], 'result.wav'))
         return wav
 
     def _load_local_configs(self):
-        with open(self.configs["VocoderConfigPath"], "r") as ymlfile:
+        with open(self.main_configs["VocoderConfigPath"], "r") as ymlfile:
             self.model_config = yaml.load(ymlfile)
 
     def _init_baseline_model(self):

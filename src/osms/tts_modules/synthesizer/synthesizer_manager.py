@@ -12,12 +12,12 @@ import yaml
 
 class SynthesizerManager(AbstractTTSModuleManager):
     def __init__(self,
-                 configs,
+                 main_configs,
                  model=None,
                  test_dataloader=None,
                  train_dataloader=None
                  ):
-        super(SynthesizerManager, self).__init__(configs,
+        super(SynthesizerManager, self).__init__(main_configs,
                                                  model,
                                                  test_dataloader,
                                                  train_dataloader
@@ -93,7 +93,7 @@ class SynthesizerManager(AbstractTTSModuleManager):
         pass
 
     def _load_local_configs(self):
-        with open(self.configs["SynthesizerConfigPath"], "r") as ymlfile:
+        with open(self.main_configs["SynthesizerConfigPath"], "r") as ymlfile:
             self.model_config = yaml.load(ymlfile)
 
     def _init_baseline_model(self):

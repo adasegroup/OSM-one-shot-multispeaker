@@ -60,26 +60,26 @@ def _add_default_tacotron_tts_configs(config, freeze=True):
     if config.is_frozen():
         config.defrost()
 
-    config.TTS = CN()
-    config.TTS.PRETRAINED = True
-    config.TTS.CHECKPOINT_DIR_PATH = os.path.join("checkpoints", "synthesizer")
-    config.TTS.EMBED_DIMS = 512  # Embedding dimension for the graphemes/phoneme inputs
-    config.TTS.ENCODER_DIMS = 256
-    config.TTS.DECODER_DIMS = 128
-    config.TTS.POSTNET_DIMS = 512
-    config.TTS.ENCODER_K = 5
-    config.TTS.LSTM_DIMS = 1024
-    config.TTS.POSTNET_K = 5
-    config.TTS.NUM_HIGHWAYS = 4
-    config.TTS.DROPOUT = 0.5
-    config.TTS.CLEANER_NAMES = ["english_cleaners"]
-    config.TTS.STOP_THRESHOLD = -3.4
+    config.MODEL = CN()
+    config.MODEL.PRETRAINED = True
+    config.MODEL.CHECKPOINT_DIR_PATH = os.path.join("checkpoints", "synthesizer")
+    config.MODEL.EMBED_DIMS = 512  # Embedding dimension for the graphemes/phoneme inputs
+    config.MODEL.ENCODER_DIMS = 256
+    config.MODEL.DECODER_DIMS = 128
+    config.MODEL.POSTNET_DIMS = 512
+    config.MODEL.ENCODER_K = 5
+    config.MODEL.LSTM_DIMS = 1024
+    config.MODEL.POSTNET_K = 5
+    config.MODEL.NUM_HIGHWAYS = 4
+    config.MODEL.DROPOUT = 0.5
+    config.MODEL.CLEANER_NAMES = ["english_cleaners"]
+    config.MODEL.STOP_THRESHOLD = -3.4
 
     # Tacotron Training
     # Progressive training schedule: (r, lr, step, batch_size),
     # where r = reduction factor (# of mel frames synthesized for each decoder iteration),
     # lr = learning rate
-    config.TTS.SCHEDULE = [(2, 1e-3, 20_000, 12),
+    config.MODEL.SCHEDULE = [(2, 1e-3, 20_000, 12),
                        (2, 5e-4, 40_000, 12),
                        (2, 2e-4, 80_000, 12),
                        (2, 1e-4, 160_000, 12),
@@ -88,11 +88,11 @@ def _add_default_tacotron_tts_configs(config, freeze=True):
                        ]
     # Clips the gradient norm to prevent explosion
     # Set to None if not needed
-    config.TTS.CLIP_GRAD_NORM = 1.0
+    config.MODEL.CLIP_GRAD_NORM = 1.0
     # Number of steps between model evaluation (sample generation)
     # Set to -1 to generate after completing epoch, or 0 to disable
-    config.TTS.EVAL_INTERVAL = 500
-    config.TTS.EVAL_NUM_SAMPLES = 1
+    config.MODEL.EVAL_INTERVAL = 500
+    config.MODEL.EVAL_NUM_SAMPLES = 1
 
     if freeze:
         config.freeze()

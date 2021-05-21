@@ -6,7 +6,7 @@ from ..tts_modules.vocoder import VocoderManager
 
 class MultispeakerManager:
     def __init__(self,
-                 configs,
+                 main_configs,
                  encoder=None,
                  encoder_test_dataloader=None,
                  encoder_train_dataloader=None,
@@ -17,19 +17,19 @@ class MultispeakerManager:
                  vocoder_test_dataloader=None,
                  vocoder_train_dataloader=None
                  ):
-        self.configs = configs
-        self.encoder_manager = SpeakerEncoderManager(configs,
+        self.configs = main_configs
+        self.encoder_manager = SpeakerEncoderManager(main_configs,
                                                      model=encoder,
                                                      test_dataloader=encoder_test_dataloader,
                                                      train_dataloader=encoder_train_dataloader
                                                      )
 
-        self.synthesizer_manager = SynthesizerManager(configs,
+        self.synthesizer_manager = SynthesizerManager(main_configs,
                                                       model=synthesizer,
                                                       test_dataloader=synthesizer_test_dataloader,
                                                       train_dataloader=synthesizer_train_dataloader
                                                       )
-        self.vocoder_manager = VocoderManager(configs,
+        self.vocoder_manager = VocoderManager(main_configs,
                                               model=vocoder,
                                               test_dataloader=vocoder_test_dataloader,
                                               train_dataloader=vocoder_train_dataloader
