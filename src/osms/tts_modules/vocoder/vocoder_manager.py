@@ -1,10 +1,10 @@
 from .. import AbstractTTSModuleManager
 from .models import WaveRNN
-from .configs import hparams as hp
+from .configs import get_default_vocoder_config
+from osms.common.configs import update_config
 from .utils.audio import save_wav
 import torch
 import os
-import yaml
 
 
 class VocoderManager(AbstractTTSModuleManager):
@@ -26,44 +26,49 @@ class VocoderManager(AbstractTTSModuleManager):
         Infers the waveform of a mel spectrogram output by the synthesizer (the format must match
         that of the synthesizer!)
 
+        :param mel:
         :param normalize:
         :param batched:
         :param target:
         :param overlap:
-        :return:
+        :param do_save_wav:
+        :return: wav file
         """
         if self.model is None:
             raise Exception("Load WaveRNN, please!")
 
         if normalize:
-            mel = mel / hp.mel_max_abs_value
+            mel = mel / self.module_configs.SP.MAX_ABS_VALUE
         mel = torch.from_numpy(mel[None, ...])
-        wav = self.model.generate(mel, batched, target, overlap, hp.mu_law)
+        wav = self.model.generate(mel, batched, target, overlap, self.module_configs.SP.MU_LAW)
         if do_save_wav:
-            save_wav(wav, os.path.join(self.main_configs["OUTPUT_AUDIO_DIR"], 'result.wav'))
+            save_wav(wav, os.path.join(self.main_configs.OUTPUT_AUDIO_DIR, 'result.wav'))
         return wav
 
     def _load_local_configs(self):
-        with open(self.main_configs["VocoderConfigPath"], "r") as ymlfile:
-            self.model_config = yaml.load(ymlfile)
+        self.module_configs = get_default_vocoder_config()
+        self.module_configs = update_config(self.module_configs,
+                                            update_file=self.main_configs.VOCODER_CONFIG_FILE
+                                            )
+        return None
 
     def _init_baseline_model(self):
         self.model_name = "WaveRNN"
-        self.model = WaveRNN(rnn_dims=hp.voc_rnn_dims,
-                             fc_dims=hp.voc_fc_dims,
-                             bits=hp.bits,
-                             pad=hp.voc_pad,
-                             upsample_factors=hp.voc_upsample_factors,
-                             feat_dims=hp.num_mels,
-                             compute_dims=hp.voc_compute_dims,
-                             res_out_dims=hp.voc_res_out_dims,
-                             res_blocks=hp.voc_res_blocks,
-                             hop_length=hp.hop_length,
-                             sample_rate=hp.sample_rate,
+        self.model = WaveRNN(rnn_dims=self.module_configs.MODEL.RNN_DIMS,
+                             fc_dims=self.module_configs.MODEL.FC_DIMS,
+                             bits=self.module_configs.SP.BITS,
+                             pad=self.module_configs.MODEL.PAD,
+                             upsample_factors=self.module_configs.MODEL.UPSAMPLE_FACTORS,
+                             feat_dims=self.module_configs.SP.NUM_MELS,
+                             compute_dims=self.module_configs.MODEL.COMPUTE_DIMS,
+                             res_out_dims=self.module_configs.MODEL.RES_OUT_DIMS,
+                             res_blocks=self.module_configs.MODEL.RES_BLOCKS,
+                             hop_length=self.module_configs.SP.HOP_SIZE,
+                             sample_rate=self.module_configs.SP.SAMPLE_RATE,
                              device=self.device,
-                             mode=hp.voc_mode,
-                             verbose=self.model_config["verbose"]
+                             mode=self.module_configs.MODEL.MODE,
+                             verbose=self.module_configs.VERBOSE
                              ).to(self.device)
-        if self.model_config["pretrained"]:
+        if self.module_configs.MODEL.PRETRAINED:
             self._load_baseline_model()
         return None
