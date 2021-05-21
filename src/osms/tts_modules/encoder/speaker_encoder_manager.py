@@ -88,7 +88,7 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
         # Process the entire utterance if not using partials
         if not using_partials:
             # processed_wav = self.preprocessor.preprocess_wav(wav)
-            frames = self.wav2mel.Wav2Mel(wav)
+            frames = self.wav2mel.wav_to_mel(wav)
             frames = torch.from_numpy(frames[None, ...]).to(self.device)
             embed = self.model.forward(frames).detach().cpu().numpy()
             self.current_embed = embed[0]
@@ -104,7 +104,7 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
 
         # Split the utterance into partials
         # processed_wav = self.preprocessor.preprocess_wav(wav)
-        frames = self.wav2mel.Wav2Mel(wav)
+        frames = self.wav2mel.wav_to_mel(wav)
         frames_batch = np.array([frames[s] for s in mel_slices])
         frames = torch.from_numpy(frames_batch).to(self.device)
         partial_embeds = self.model.forward(frames).detach().cpu().numpy()

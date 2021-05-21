@@ -14,9 +14,9 @@ class Wav2MelTransform:
         self.audio_config = audio_config
 
     def __call__(self, *args, **kwargs):
-        return self.Wav2Mel(*args, **kwargs)
+        return self.wav_to_mel(*args, **kwargs)
 
-    def Wav2Mel(self, *args, **kwargs):
+    def wav_to_mel(self, *args, **kwargs):
         """
         Derives a mel spectrogram ready to be used by the encoder from a preprocessed audio waveform.
         Note: this not a log-mel spectrogram.
@@ -31,7 +31,7 @@ class StandardWav2MelTransform(Wav2MelTransform):
     def __init__(self, audio_config):
         super(StandardWav2MelTransform, self).__init__(audio_config)
 
-    def Wav2Mel(self, wav):
+    def wav_to_mel(self, wav):
         """
         Derives a mel spectrogram ready to be used by the encoder from a preprocessed audio waveform
         using Librosa implementation.
