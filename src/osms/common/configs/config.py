@@ -39,9 +39,9 @@ def get_default_main_config():
     # _C.SPEAKER_ENCODER_CONFIG_FILE = os.path.join("configs", "encoder")
     _C.SPEAKER_ENCODER_CONFIG_FILE = None
     # _C.SPEAKER_SYNTHESIZER_CONFIG_FILE = os.path.join("configs", "synthesizer")
-    _C.SPEAKER_SYNTHESIZER_CONFIG_FILE = None
+    _C.SYNTHESIZER_CONFIG_FILE = None
     # _C.SPEAKER_VOCODER_CONFIG_FILE = os.path.join("configs", "vocoder")
-    _C.SPEAKER_VOCODER_CONFIG_FILE = None
+    _C.VOCODER_CONFIG_FILE = None
 
     _C.SPEAKER_SPEECH_PATH = os.path.join("audio_samples", "google_test.wav")
     _C.INPUT_TEXTS_PATH = os.path.join("texts", "test1.txt")

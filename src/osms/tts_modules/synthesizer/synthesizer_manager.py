@@ -1,13 +1,13 @@
 import torch
 from .. import AbstractTTSModuleManager
-from .configs.hparams import hparams
 # from .utils import audio
 from .utils.symbols import symbols
 from .utils.text import text_to_sequence
 from .models import Tacotron
+from .configs import get_default_synthesizer_config
+from osms.common.configs import update_config
 from typing import Union, List
 import numpy as np
-import yaml
 
 
 class SynthesizerManager(AbstractTTSModuleManager):
@@ -46,15 +46,15 @@ class SynthesizerManager(AbstractTTSModuleManager):
         sequence length of spectrogram i, and possibly the alignments.
         """
         # Preprocess text inputs
-        inputs = [text_to_sequence(text.strip(), hparams.tts_cleaner_names) for text in texts]
+        inputs = [text_to_sequence(text.strip(), self.module_configs.MODEL.CLEANER_NAMES) for text in texts]
         if not isinstance(embeddings, list):
             embeddings = [embeddings]
 
         # Batch inputs
-        batched_inputs = [inputs[i:i+hparams.synthesis_batch_size]
-                             for i in range(0, len(inputs), hparams.synthesis_batch_size)]
-        batched_embeds = [embeddings[i:i+hparams.synthesis_batch_size]
-                             for i in range(0, len(embeddings), hparams.synthesis_batch_size)]
+        batched_inputs = [inputs[i:i+self.module_configs.DATA.SYNTHESIS_BATCH_SIZE]
+                             for i in range(0, len(inputs), self.module_configs.DATA.SYNTHESIS_BATCH_SIZE)]
+        batched_embeds = [embeddings[i:i+self.module_configs.DATA.SYNTHESIS_BATCH_SIZE]
+                             for i in range(0, len(embeddings), self.module_configs.DATA.SYNTHESIS_BATCH_SIZE)]
 
         specs = []
         for i, batch in enumerate(batched_inputs, 1):
@@ -77,7 +77,7 @@ class SynthesizerManager(AbstractTTSModuleManager):
             mels = mels.detach().cpu().numpy()
             for m in mels:
                 # Trim silence from end of each spectrogram
-                while np.max(m[:, -1]) < hparams.tts_stop_threshold:
+                while np.max(m[:, -1]) < self.module_configs.MODEL.STOP_THRESHOLD:
                     m = m[:, :-1]
                 specs.append(m)
 
@@ -93,27 +93,30 @@ class SynthesizerManager(AbstractTTSModuleManager):
         pass
 
     def _load_local_configs(self):
-        with open(self.main_configs["SynthesizerConfigPath"], "r") as ymlfile:
-            self.model_config = yaml.load(ymlfile)
+        self.module_configs = get_default_synthesizer_config()
+        self.module_configs = update_config(self.module_configs,
+                                            update_file=self.main_configs.SYNTHESIZER_CONFIG_FILE
+                                            )
+        return None
 
     def _init_baseline_model(self):
         self.model_name = "Tacotron"
-        self.model = Tacotron(embed_dims=hparams.tts_embed_dims,
+        self.model = Tacotron(embed_dims=self.module_configs.MODEL.EMBED_DIMS,
                               num_chars=len(symbols),
-                              encoder_dims=hparams.tts_encoder_dims,
-                              decoder_dims=hparams.tts_decoder_dims,
-                              n_mels=hparams.num_mels,
-                              fft_bins=hparams.num_mels,
-                              postnet_dims=hparams.tts_postnet_dims,
-                              encoder_K=hparams.tts_encoder_K,
-                              lstm_dims=hparams.tts_lstm_dims,
-                              postnet_K=hparams.tts_postnet_K,
-                              num_highways=hparams.tts_num_highways,
-                              dropout=hparams.tts_dropout,
-                              stop_threshold=hparams.tts_stop_threshold,
-                              speaker_embedding_size=hparams.speaker_embedding_size,
-                              verbose=self.model_config["verbose"]
+                              encoder_dims=self.module_configs.MODEL.ENCODER_DIMS,
+                              decoder_dims=self.module_configs.MODEL.DECODER_DIMS,
+                              n_mels=self.module_configs.SP.NUM_MELS,
+                              fft_bins=self.module_configs.SP.NUM_MELS,
+                              postnet_dims=self.module_configs.MODEL.POSTNET_DIMS,
+                              encoder_K=self.module_configs.MODEL.ENCODER_K,
+                              lstm_dims=self.module_configs.MODEL.LSTM_DIMS,
+                              postnet_K=self.module_configs.MODEL.POSTNET_K,
+                              num_highways=self.module_configs.MODEL.NUM_HIGHWAYS,
+                              dropout=self.module_configs.MODEL.DROPOUT,
+                              stop_threshold=self.module_configs.MODEL.STOP_THRESHOLD,
+                              speaker_embedding_size=self.module_configs.SV2TTS.SPEAKER_EMBEDDING_SIZE,
+                              verbose=self.module_configs.VERBOSE
                               ).to(self.device)
-        if self.model_config["pretrained"]:
+        if self.module_configs.MODEL.PRETRAINED:
             self._load_baseline_model()
         return None
