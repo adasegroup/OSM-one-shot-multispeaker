@@ -2,6 +2,7 @@ import torch
 from ..tts_modules.encoder import SpeakerEncoderManager
 from ..tts_modules.synthesizer import SynthesizerManager
 from ..tts_modules.vocoder import VocoderManager
+from .configs import get_default_main_configs
 
 
 class MultispeakerManager:
@@ -17,19 +18,21 @@ class MultispeakerManager:
                  vocoder_test_dataloader=None,
                  vocoder_train_dataloader=None
                  ):
-        self.configs = main_configs
-        self.encoder_manager = SpeakerEncoderManager(main_configs,
+        self.main_configs = main_configs
+        if self.main_configs is None:
+            self.main_configs = get_default_main_configs()
+        self.encoder_manager = SpeakerEncoderManager(self.main_configs,
                                                      model=encoder,
                                                      test_dataloader=encoder_test_dataloader,
                                                      train_dataloader=encoder_train_dataloader
                                                      )
 
-        self.synthesizer_manager = SynthesizerManager(main_configs,
+        self.synthesizer_manager = SynthesizerManager(self.main_configs,
                                                       model=synthesizer,
                                                       test_dataloader=synthesizer_test_dataloader,
                                                       train_dataloader=synthesizer_train_dataloader
                                                       )
-        self.vocoder_manager = VocoderManager(main_configs,
+        self.vocoder_manager = VocoderManager(self.main_configs,
                                               model=vocoder,
                                               test_dataloader=vocoder_test_dataloader,
                                               train_dataloader=vocoder_train_dataloader
@@ -40,8 +43,8 @@ class MultispeakerManager:
             self.device = torch.device("cpu")
 
     def inference(self):
-        embeddings = self.process_speaker(speaker_speech_path=self.configs["SPEAKER_SPEECH_PATH"])
-        with open(self.configs["INPUT_TEXTS_PATH"], "r") as file:
+        embeddings = self.process_speaker(speaker_speech_path=self.main_configs.SPEAKER_SPEECH_PATH)
+        with open(self.main_configs.INPUT_TEXTS_PATH, "r") as file:
             texts = file.readlines()
         specs = self.synthesize_spectrograms(texts=texts, embeddings=embeddings)
         specs = specs[0]

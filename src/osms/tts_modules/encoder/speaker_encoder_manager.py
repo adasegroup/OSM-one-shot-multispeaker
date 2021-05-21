@@ -138,7 +138,7 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
 
     def _init_baseline_model(self):
         self.model_name = "DVecModel"
-        self.model = DVecModel(self.device, self.device, self.module_configs)
+        self.model = DVecModel(self.module_configs)
         if self.module_configs.MODEL.PRETRAINED:
             self._load_baseline_model()
         return None
@@ -206,7 +206,7 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
         """
         sampling_rate = self.module_configs.AUDIO.SAMPLING_RATE
         mel_window_step = self.module_configs.AUDIO.MEL_WINDOW_STEP
-        partial_utterance_n_frames = self.amodule_configs.AUDIO.PARTIAL_UTTERANCE_N_FRAMES
+        partial_utterance_n_frames = self.module_configs.AUDIO.PARTIAL_N_FRAMES
 
         assert 0 <= overlap < 1
         assert 0 < min_pad_coverage <= 1

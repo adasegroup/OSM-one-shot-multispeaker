@@ -21,7 +21,8 @@ def get_default_encoder_config():
 
     _C.MODEL = CN()
     _C.MODEL.PRETRAINED = True
-    _C.MODEL.CHECKPOINT_DIR_PATH = os.path.join("checkpoints", "encoder", "checkpoints")
+    # _C.MODEL.CHECKPOINT_DIR_PATH = os.path.join("checkpoints", "encoder", "checkpoints")
+    _C.MODEL.CHECKPOINT_DIR_PATH = "checkpoints"
     _C.MODEL.MODEL_HIDDEN_SIZE = 256
     _C.MODEL.MODEL_EMBEDDING_SIZE = 256
     _C.MODEL.MODEL_NUM_LAYERS = 3

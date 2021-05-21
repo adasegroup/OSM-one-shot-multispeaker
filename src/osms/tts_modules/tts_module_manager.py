@@ -4,7 +4,13 @@ import os
 
 
 class AbstractTTSModuleManager:
-    def __init__(self, main_configs, model=None, test_dataloader=None, train_dataloader=None, optimizer=None):
+    def __init__(self,
+                 main_configs,
+                 model=None,
+                 test_dataloader=None,
+                 train_dataloader=None,
+                 optimizer=None
+                 ):
         self.main_configs = main_configs
         self.module_configs = None
         self.model_name = None
