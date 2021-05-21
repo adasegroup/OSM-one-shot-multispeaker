@@ -107,6 +107,7 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
 
 
 
+
     def process_speaker(self, speaker_speech_path, save_embeddings_path=None,
                         save_embeddings_speaker_name="test_speaker"):
         """ produce embeddings for one utterance"""
