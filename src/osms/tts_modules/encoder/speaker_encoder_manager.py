@@ -93,20 +93,17 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
         #     self.test_dataloader = SpeakerEncoderDataLoader(self.module_configs, train_dataset, 'test')
         if self.optimizer is None:
             self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.module_configs.TRAIN.LEARNING_RATE_INIT)
-
         self.trainer = SpeakerEncoderTrainer(self.module_configs, self.model, self.train_dataloader,
                                              self.test_dataloader, self.optimizer)
 
+
     def train_session(self, number_steps=None):
         self.__init_trainer()
+        self.trainer.init_training_session()
         if number_steps is None:
             self.trainer.train(self.module_configs.TRAIN.NUMBER_STEPS)
         else:
             self.trainer.train(number_steps)
-
-
-
-
 
     def process_speaker(self, speaker_speech_path, save_embeddings_path=None,
                         save_embeddings_speaker_name="test_speaker"):
@@ -119,22 +116,12 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
 
         return embed
 
-
-
     # TODO: Correct config loading
     def _load_local_configs(self):
         self.module_configs = get_default_encoder_config()
         self.module_configs = update_config(self.module_configs,
                                             update_file=self.main_configs.SPEAKER_ENCODER_CONFIG_FILE
                                             )
-        # if "AudioConfigPath" in self.main_configs.keys():
-        #     audio_config_path = self.main_configs["AudioConfigPath"]
-        # else:
-        #     audio_config_path = "./"
-        # with open(audio_config_path, "r") as ymlfile:
-        #     self.audio_config = yaml.load(ymlfile)
-        # with open(self.main_configs["SpeakerEncoderConfigPath"], "r") as ymlfile:
-        #     self.module_configs = yaml.load(ymlfile)
         return None
 
     def _init_baseline_model(self):
