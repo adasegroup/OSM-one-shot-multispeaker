@@ -57,12 +57,14 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
                  preprocessor=None,
                  wav2mel=None,
                  test_dataloader=None,
-                 train_dataloader=None
+                 train_dataloader=None,
+                 optimizer=None
                  ):
         super(SpeakerEncoderManager, self).__init__(main_configs,
                                                     model,
                                                     test_dataloader,
-                                                    train_dataloader
+                                                    train_dataloader,
+                                                    optimizer
                                                     )
         if preprocessor is None:
             self.preprocessor = StandardAudioPreprocessor(self.module_configs)
@@ -78,22 +80,26 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
         self.trainer = None
         self.dataset = None
 
-    def init_trainer(self):
+    def __init_trainer(self):
         if self.train_dataloader is None:
             dataset_preprocessor = PreprocessLibriSpeechDataset(self.module_configs, self.preprocessor, self.wav2mel)
             dataset_preprocessor.preprocess_dataset()
             train_dataset = SpeakerEncoderDataset(self.module_configs)
             self.train_dataloader = SpeakerEncoderDataLoader(self.module_configs, train_dataset, 'train')
-        if self.test_dataloader is None:
-            dataset_preprocessor = PreprocessLibriSpeechDataset(self.module_configs, self.preprocessor, self.wav2mel)
-            dataset_preprocessor.preprocess_dataset()
-            train_dataset = SpeakerEncoderDataset(self.module_configs)
-            self.train_dataloader = SpeakerEncoderDataLoader(self.module_configs, train_dataset, 'train')
-
+        # if self.test_dataloader is None:
+        #     dataset_preprocessor = PreprocessLibriSpeechDataset(self.module_configs, self.preprocessor, self.wav2mel)
+        #     dataset_preprocessor.preprocess_dataset()
+        #     test_dataset = SpeakerEncoderDataset(self.module_configs)
+        #     self.test_dataloader = SpeakerEncoderDataLoader(self.module_configs, train_dataset, 'test')
+        if self.optimizer is None:
+            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.module_configs.TRAIN.LEARNING_RATE_INIT)
 
         self.trainer = SpeakerEncoderTrainer(self.module_configs, self.model, self.train_dataloader,
                                              self.test_dataloader, self.optimizer)
 
+    def train_session(self, number_step):
+        self.__init_trainer()
+        self.trainer.train(number_step)
 
 
 
@@ -194,9 +200,9 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
         respectively the waveform and the mel spectrogram with these slices to obtain the partial
         utterances.
         """
-        sampling_rate = self.audio_config["SAMPLING_RATE"]
-        mel_window_step = self.audio_config["MEL_WINDOW_STEP"]
-        partial_utterance_n_frames = self.audio_config["PARTIAL_UTTERANCE_N_FRAMES"]
+        sampling_rate = self.module_configs.AUDIO.SAMPLING_RATE
+        mel_window_step = self.module_configs.AUDIO.MEL_WINDOW_STEP
+        partial_utterance_n_frames = self.amodule_configs.AUDIO.PARTIAL_UTTERANCE_N_FRAMES
 
         assert 0 <= overlap < 1
         assert 0 < min_pad_coverage <= 1

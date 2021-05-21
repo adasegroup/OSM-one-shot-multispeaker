@@ -10,7 +10,6 @@ class SpeakerEncoderTrainer:
         self.test_loader = test_loader
         self.optimizer = optimizer
         self.device = config.DEVICE
-        self.number_steps = self.config.TRAIN.NUMBER_STEPS
         if self.config.TRAIN.CHECKPOINT_NAME is not None:
             self.checkpoint_path = os.path.join(self.config.CHECKPOINT_DIR_PATH,
                                                 self.config.TRAIN.CHECKPOINT_NAME)
@@ -62,7 +61,7 @@ class SpeakerEncoderTrainer:
         self.model.do_gradient_ops()
         self.optimizer.step()
 
-    def train(self):
+    def train(self, number_steps):
         for n_step, speaker_batch in enumerate(self.train_dataloader):
             self.train_one_step(speaker_batch)
             self.step += 1
@@ -74,7 +73,7 @@ class SpeakerEncoderTrainer:
                     "optimizer_state": self.optimizer.state_dict(),
                 }, os.path.join(self.out_dir, "checkpoints", self.run_id + "_STEP_" + str(self.step) + ".pt"))
 
-            if self.number_steps == n_step:
+            if number_steps == n_step:
                 print("Stopping Training Session")
                 break
 
