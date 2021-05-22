@@ -26,11 +26,11 @@ class VocoderTrainer:
 
 
 
-        self.syn_dir =
-        self.voc_dir =
-        self.model_dirs =
-        self.ground_truth =
-        self.save_every =
+        # self.syn_dir =
+        # self.voc_dir =
+        # self.model_dirs =
+        # self.ground_truth =
+        # self.save_every =
 
         self.step = 1
         self.save_n_steps = self.config.TRAIN.SAVE_N_STEPS
