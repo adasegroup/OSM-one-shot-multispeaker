@@ -47,95 +47,106 @@ def start_and_end_indices(quantized, silence_threshold=2):
     return start, end
 
 
-def get_hop_size(hparams):
-    hop_size = hparams.hop_size
+def get_hop_size(configs):
+    hop_size = configs.SP.HOP_SIZE
     if hop_size is None:
-        assert hparams.frame_shift_ms is not None
-        hop_size = int(hparams.frame_shift_ms / 1000 * hparams.sample_rate)
+        assert configs.frame_shift_ms is not None
+        hop_size = int(configs.frame_shift_ms / 1000 * configs.SP.SAMPLE_RATE)
     return hop_size
 
 
-def linearspectrogram(wav, hparams):
-    D = _stft(preemphasis(wav, hparams.preemphasis, hparams.preemphasize), hparams)
-    S = _amp_to_db(np.abs(D), hparams) - hparams.ref_level_db
+def linearspectrogram(wav, configs):
+    D = _stft(preemphasis(wav, configs.SP.PREEMPHASIS, configs.SP.PREEMPHASIZE), configs)
+    S = _amp_to_db(np.abs(D), configs) - configs.SP.REF_LEVEL_DB
 
-    if hparams.signal_normalization:
-        return _normalize(S, hparams)
+    if configs.MEL.SIGNAL_NORMALIZATION:
+        return _normalize(S, configs)
     return S
 
 
-def melspectrogram(wav, hparams):
-    D = _stft(preemphasis(wav, hparams.preemphasis, hparams.preemphasize), hparams)
-    S = _amp_to_db(_linear_to_mel(np.abs(D), hparams), hparams) - hparams.ref_level_db
+def melspectrogram(wav, configs):
+    D = _stft(preemphasis(wav, configs.SP.PREEMPHASIS, configs.SP.PREEMPHASIZE), configs)
+    S = _amp_to_db(_linear_to_mel(np.abs(D), configs), configs) - configs.SP.REF_LEVEL_DB
 
-    if hparams.signal_normalization:
-        return _normalize(S, hparams)
+    if configs.MEL.SIGNAL_NORMALIZATION:
+        return _normalize(S, configs)
     return S
 
 
-def inv_linear_spectrogram(linear_spectrogram, hparams):
+def inv_linear_spectrogram(linear_spectrogram, configs):
     """Converts linear spectrogram to waveform using librosa"""
-    if hparams.signal_normalization:
-        D = _denormalize(linear_spectrogram, hparams)
+    if configs.MEL.SIGNAL_NORMALIZATION:
+        D = _denormalize(linear_spectrogram, configs)
     else:
         D = linear_spectrogram
 
-    S = _db_to_amp(D + hparams.ref_level_db)  # Convert back to linear
+    S = _db_to_amp(D + configs.SP.REF_LEVEL_DB)  # Convert back to linear
 
-    if hparams.use_lws:
-        processor = _lws_processor(hparams)
-        D = processor.run_lws(S.astype(np.float64).T ** hparams.power)
+    if configs.AUDIO.USE_LWS:
+        processor = _lws_processor(configs)
+        D = processor.run_lws(S.astype(np.float64).T ** configs.MEL.POWER)
         y = processor.istft(D).astype(np.float32)
-        return inv_preemphasis(y, hparams.preemphasis, hparams.preemphasize)
+        return inv_preemphasis(y, configs.SP.PREEMPHASIS, configs.SP.PREEMPHASIZE)
     else:
-        return inv_preemphasis(_griffin_lim(S ** hparams.power, hparams), hparams.preemphasis, hparams.preemphasize)
+        return inv_preemphasis(_griffin_lim(S ** configs.MEL.POWER, configs),
+                               configs.SP.PREEMPHASIS,
+                               configs.SP.PREEMPHASIZE
+                               )
 
 
-def inv_mel_spectrogram(mel_spectrogram, hparams):
+def inv_mel_spectrogram(mel_spectrogram, configs):
     """Converts mel spectrogram to waveform using librosa"""
-    if hparams.signal_normalization:
-        D = _denormalize(mel_spectrogram, hparams)
+    if configs.MEL.SIGNAL_NORMALIZATION:
+        D = _denormalize(mel_spectrogram, configs)
     else:
         D = mel_spectrogram
 
-    S = _mel_to_linear(_db_to_amp(D + hparams.ref_level_db), hparams)  # Convert back to linear
+    S = _mel_to_linear(_db_to_amp(D + configs.SP.REF_LEVEL_DB), configs)  # Convert back to linear
 
-    if hparams.use_lws:
-        processor = _lws_processor(hparams)
-        D = processor.run_lws(S.astype(np.float64).T ** hparams.power)
+    if configs.AUDIO.USE_LWS:
+        processor = _lws_processor(configs)
+        D = processor.run_lws(S.astype(np.float64).T ** configs.MEL.POWER)
         y = processor.istft(D).astype(np.float32)
-        return inv_preemphasis(y, hparams.preemphasis, hparams.preemphasize)
+        return inv_preemphasis(y,
+                               configs.SP.PREEMPHASIS,
+                               configs.SP.PREEMPHASIZE)
     else:
-        return inv_preemphasis(_griffin_lim(S ** hparams.power, hparams), hparams.preemphasis, hparams.preemphasize)
+        return inv_preemphasis(_griffin_lim(S ** configs.MEL.POWER, configs),
+                               configs.SP.PREEMPHASIS,
+                               configs.SP.PREEMPHASIZE)
 
 
-def _lws_processor(hparams):
+def _lws_processor(configs):
     import lws
-    return lws.lws(hparams.n_fft, get_hop_size(hparams), fftsize=hparams.win_size, mode="speech")
+    return lws.lws(configs.SP.N_FFT, get_hop_size(configs), fftsize=configs.SP.WIN_SIZE, mode="speech")
 
 
-def _griffin_lim(S, hparams):
+def _griffin_lim(S, configs):
     """librosa implementation of Griffin-Lim
     Based on https://github.com/librosa/librosa/issues/434
     """
     angles = np.exp(2j * np.pi * np.random.rand(*S.shape))
     S_complex = np.abs(S).astype(np.complex)
-    y = _istft(S_complex * angles, hparams)
-    for i in range(hparams.griffin_lim_iters):
-        angles = np.exp(1j * np.angle(_stft(y, hparams)))
-        y = _istft(S_complex * angles, hparams)
+    y = _istft(S_complex * angles, configs)
+    for i in range(configs.MEL.GRIFFIN_LIM_ITERS):
+        angles = np.exp(1j * np.angle(_stft(y, configs)))
+        y = _istft(S_complex * angles, configs)
     return y
 
 
-def _stft(y, hparams):
-    if hparams.use_lws:
-        return _lws_processor(hparams).stft(y).T
+def _stft(y, configs):
+    if configs.AUDIO.USE_LWS:
+        return _lws_processor(configs).stft(y).T
     else:
-        return librosa.stft(y=y, n_fft=hparams.n_fft, hop_length=get_hop_size(hparams), win_length=hparams.win_size)
+        return librosa.stft(y=y,
+                            n_fft=configs.SP.N_FFT,
+                            hop_length=get_hop_size(configs),
+                            win_length=configs.SP.WIN_SIZE
+                            )
 
 
-def _istft(y, hparams):
-    return librosa.istft(y, hop_length=get_hop_size(hparams), win_length=hparams.win_size)
+def _istft(y, configs):
+    return librosa.istft(y, hop_length=get_hop_size(configs), win_length=configs.SP.WIN_SIZE)
 
 
 ##########################################################
@@ -172,28 +183,28 @@ _mel_basis = None
 _inv_mel_basis = None
 
 
-def _linear_to_mel(spectogram, hparams):
+def _linear_to_mel(spectogram, configs):
     global _mel_basis
     if _mel_basis is None:
-        _mel_basis = _build_mel_basis(hparams)
+        _mel_basis = _build_mel_basis(configs)
     return np.dot(_mel_basis, spectogram)
 
 
-def _mel_to_linear(mel_spectrogram, hparams):
+def _mel_to_linear(mel_spectrogram, configs):
     global _inv_mel_basis
     if _inv_mel_basis is None:
-        _inv_mel_basis = np.linalg.pinv(_build_mel_basis(hparams))
+        _inv_mel_basis = np.linalg.pinv(_build_mel_basis(configs))
     return np.maximum(1e-10, np.dot(_inv_mel_basis, mel_spectrogram))
 
 
-def _build_mel_basis(hparams):
-    assert hparams.fmax <= hparams.sample_rate // 2
-    return librosa.filters.mel(hparams.sample_rate, hparams.n_fft, n_mels=hparams.num_mels,
-                               fmin=hparams.fmin, fmax=hparams.fmax)
+def _build_mel_basis(configs):
+    assert configs.AUDIO.FMAX <= configs.SP.SAMPLE_RATE // 2
+    return librosa.filters.mel(configs.SP.SAMPLE_RATE, configs.SP.N_FFT, n_mels=configs.SP.NUM_MELS,
+                               fmin=configs.SP.FMIN, fmax=configs.AUDIO.FMAX)
 
 
-def _amp_to_db(x, hparams):
-    min_level = np.exp(hparams.min_level_db / 20 * np.log(10))
+def _amp_to_db(x, configs):
+    min_level = np.exp(configs.SP.MIN_LEVEL_DB / 20 * np.log(10))
     return 20 * np.log10(np.maximum(min_level, x))
 
 
@@ -201,37 +212,37 @@ def _db_to_amp(x):
     return np.power(10.0, (x) * 0.05)
 
 
-def _normalize(S, hparams):
-    if hparams.allow_clipping_in_normalization:
-        if hparams.symmetric_mels:
-            return np.clip((2 * hparams.max_abs_value) * (
-                        (S - hparams.min_level_db) / (-hparams.min_level_db)) - hparams.max_abs_value,
-                           -hparams.max_abs_value, hparams.max_abs_value)
+def _normalize(S, configs):
+    if configs.AUDIO.ALLOW_CLIPPING_IN_NORMALIZATION:
+        if configs.AUDIO.SYMMETRIC_MELS:
+            return np.clip((2 * configs.SP.MAX_ABS_VALUE) * (
+                        (S - configs.SP.MIN_LEVEL_DB) / (-configs.SP.MIN_LEVEL_DB)) - configs.SP.MAX_ABS_VALUE,
+                           -configs.SP.MAX_ABS_VALUE, configs.SP.MAX_ABS_VALUE)
         else:
-            return np.clip(hparams.max_abs_value * ((S - hparams.min_level_db) / (-hparams.min_level_db)), 0,
-                           hparams.max_abs_value)
+            return np.clip(configs.SP.MAX_ABS_VALUE * ((S - configs.SP.MIN_LEVEL_DB) / (-configs.SP.MIN_LEVEL_DB)), 0,
+                           configs.SP.MAX_ABS_VALUE)
 
-    assert S.max() <= 0 and S.min() - hparams.min_level_db >= 0
-    if hparams.symmetric_mels:
-        return (2 * hparams.max_abs_value) * (
-                    (S - hparams.min_level_db) / (-hparams.min_level_db)) - hparams.max_abs_value
+    assert S.max() <= 0 and S.min() - configs.SP.MIN_LEVEL_DB >= 0
+    if configs.AUDIO.SYMMETRIC_MELS:
+        return (2 * configs.SP.MAX_ABS_VALUE) * (
+                    (S - configs.SP.MIN_LEVEL_DB) / (-configs.SP.MIN_LEVEL_DB)) - configs.SP.MAX_ABS_VALUE
     else:
-        return hparams.max_abs_value * ((S - hparams.min_level_db) / (-hparams.min_level_db))
+        return configs.SP.MAX_ABS_VALUE * ((S - configs.SP.MIN_LEVEL_DB) / (-configs.SP.MIN_LEVEL_DB))
 
 
-def _denormalize(D, hparams):
-    if hparams.allow_clipping_in_normalization:
-        if hparams.symmetric_mels:
-            return (((np.clip(D, -hparams.max_abs_value,
-                              hparams.max_abs_value) + hparams.max_abs_value) * -hparams.min_level_db / (
-                                 2 * hparams.max_abs_value))
-                    + hparams.min_level_db)
+def _denormalize(D, configs):
+    if configs.AUDIO.ALLOW_CLIPPING_IN_NORMALIZATION:
+        if configs.AUDIO.SYMMETRIC_MELS:
+            return (((np.clip(D, -configs.SP.MAX_ABS_VALUE,
+                              configs.SP.MAX_ABS_VALUE) + configs.SP.MAX_ABS_VALUE) * -configs.SP.MIN_LEVEL_DB / (
+                                 2 * configs.SP.MAX_ABS_VALUE))
+                    + configs.SP.MIN_LEVEL_DB)
         else:
             return ((np.clip(D, 0,
-                             hparams.max_abs_value) * -hparams.min_level_db / hparams.max_abs_value) + hparams.min_level_db)
+                             configs.SP.MAX_ABS_VALUE) * -configs.SP.MIN_LEVEL_DB / configs.SP.MAX_ABS_VALUE) + configs.SP.MIN_LEVEL_DB)
 
-    if hparams.symmetric_mels:
-        return (((D + hparams.max_abs_value) * -hparams.min_level_db / (
-                    2 * hparams.max_abs_value)) + hparams.min_level_db)
+    if configs.AUDIO.SYMMETRIC_MELS:
+        return (((D + configs.SP.MAX_ABS_VALUE) * -configs.SP.MIN_LEVEL_DB / (
+                    2 * configs.SP.MAX_ABS_VALUE)) + configs.SP.MIN_LEVEL_DB)
     else:
-        return ((D * -hparams.min_level_db / hparams.max_abs_value) + hparams.min_level_db)
+        return ((D * -configs.SP.MIN_LEVEL_DB / configs.SP.MAX_ABS_VALUE) + configs.SP.MIN_LEVEL_DB)
