@@ -10,8 +10,9 @@ import os
 import requests
 
 
-def run_synthesis(in_dir, out_dir, config):
+def run_synthesis(out_dir, config):
     # Generate ground truth-aligned mels for vocoder training
+    in_dir = config.DATA.SYN_DIR
     synth_dir = Path(out_dir).joinpath("mels_gta")
     synth_dir.mkdir(exist_ok=True)
 
@@ -41,7 +42,7 @@ def run_synthesis(in_dir, out_dir, config):
                      ).to(device)
 
     # Load the weights
-    load_baseline_model(model, config, device)
+    load_tacotron_model(model, config, device)
 
     # Synthesize using same reduction factor as the model is currently trained
     r = np.int32(model.r)
@@ -88,7 +89,7 @@ def run_synthesis(in_dir, out_dir, config):
                 file.write("|".join(dataset.metadata[k]))
 
 
-def load_baseline_model(model, config, device):
+def load_tacotron_model(model, config, device):
     checkpoint = get_baseline_checkpoint(model, config, device)
     model = load_routine(model, checkpoint, device)
     return model
@@ -105,20 +106,20 @@ def get_baseline_checkpoint(model, config, device):
         model = load_from_dropbox(model, config, file_full_path)
     else:
         if config.VERBOSE:
-            print(f'Loading Tacatron checkpoint from {file_full_path}')
+            print(f'Loading Tacotron checkpoint from {file_full_path}')
     checkpoint = torch.load(file_full_path, map_location=device)
     return checkpoint
 
 
 def load_from_dropbox(model, config, file_full_path):
     if config.VERBOSE:
-        print(f'Downloading Tacatron checkpoint from Dropbox...')
+        print(f'Downloading Tacotron checkpoint from Dropbox...')
     try:
         req = requests.get(model.get_download_url())
         with open(file_full_path, 'wb') as f:
             f.write(req.content)
     except requests.exceptions.RequestException as e:
-        print(f'Baseline Tacatron checkpoint was not loaded from Dropbox!')
+        print(f'Baseline Tacotron checkpoint was not loaded from Dropbox!')
         print(f'Stacktrace: {e}')
     return model
 
