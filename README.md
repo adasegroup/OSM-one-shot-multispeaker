@@ -143,6 +143,16 @@ Gleb will implement the working stack of models, write documentations and usage 
 ```
 ## Installation 
 Run `pip3 install .` from root directory.
+## Datasets
+We have implemented complete processing for LibraSpeech Dataset for Speaker Encoder, Synthesizer and Vocoder . One can download LibraSpeech dataset via this [link](hhttps://www.openslr.org/12 "link"). Also, for Speaker Encoder we implemented interface to use custom dataset. One need implement `PreprocessDataset` interface functions, `WavPreprocessor` interface functions, `WavPreprocessor` interface functions. Or one can use implemented ones. 
+## Configs
+For baseline models the default configs will be loaded automatically. To change them one can use `update_config(...)` in `osms/common/configs/config.py`. To load default config one can use `get_default_"module_name"_config(...)`. Also, one can implement your own configs to use with other models. 
+## Managers 
+To work with each three modules we implemented its own manager: `SpeakerEncoderManager`, `SynthesizerManager`, `VocoderManager`. As main manager we implemented `MustiSpreakerManager` which give access to all three managers. One can use them to inference the whole TTS model and train each modules separately or together. The example of usage can be found in notebook.
+## Checkpoints
+Baseline checkpoints are uploaded automatically in `checkpoints` directory with creation of 'MultiSpeaker' object. Also, one can use other checkpoints by simple update of config (change ...CHECKPOINT_DIR_PATH, CHECKPOINT_NAME). 
+
+
 
  
 ## References
