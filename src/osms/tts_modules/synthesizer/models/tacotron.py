@@ -480,6 +480,17 @@ class Tacotron(nn.Module):
 
         return mel_outputs, linear, attn_scores
 
+    def save(self, path, optimizer=None):
+        if optimizer is not None:
+            torch.save({
+                "model_state": self.state_dict(),
+                "optimizer_state": optimizer.state_dict(),
+            }, str(path))
+        else:
+            torch.save({
+                "model_state": self.state_dict(),
+            }, str(path))
+
     def init_model(self):
         for p in self.parameters():
             if p.dim() > 1: nn.init.xavier_uniform_(p)
