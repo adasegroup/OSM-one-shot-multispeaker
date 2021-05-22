@@ -1,6 +1,7 @@
 import torch
 from .. import AbstractTTSModuleManager
-# from .utils import audio
+from ..encoder import SpeakerEncoderManager
+from .data import SynthesizerPreprocessor
 from .utils.symbols import symbols
 from .utils.text import text_to_sequence
 from .models import Tacotron
@@ -15,13 +16,18 @@ class SynthesizerManager(AbstractTTSModuleManager):
                  main_configs,
                  model=None,
                  test_dataloader=None,
-                 train_dataloader=None
+                 train_dataloader=None,
+                 encoder_manager=None
                  ):
         super(SynthesizerManager, self).__init__(main_configs,
                                                  model,
                                                  test_dataloader,
                                                  train_dataloader
                                                  )
+        self.encoder_manager = encoder_manager
+        if self.encoder_manager is None:
+            self.encoder_manager = SpeakerEncoderManager(self.main_configs)
+        self.preprocessor = SynthesizerPreprocessor(self.module_configs, self.encoder_manager)
 
     def __call__(self, *args, **kwargs):
         return self.synthesize_spectrograms(*args, **kwargs)
