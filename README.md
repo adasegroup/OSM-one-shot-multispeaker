@@ -54,7 +54,107 @@ From a high point, our project consists of 3 main elements: Speaker Encoder, Syn
 ## Roles of the Participants
 Nikolay will design the modular architecture, API for external usage and training pipeline.
 Gleb will implement the working stack of models, write documentations and usage examples.
+## Project Structure 
+```bash
+.
+└── osms
+    ├── __init__.py
+    ├── common
+    │   ├── __init__.py
+    │   ├── configs
+    │   │   ├── __init__.py
+    │   │   ├── config.py
+    │   │   └── main_config.yaml
+    │   └── multispeaker.py
+    ├── main.py
+    ├── tts_modules
+    │   ├── __init__.py
+    │   ├── encoder
+    │   │   ├── __init__.py
+    │   │   ├── configs
+    │   │   │   ├── AudioConfig.yaml
+    │   │   │   ├── __init__.py
+    │   │   │   ├── config.py
+    │   │   │   └── dVecModelConfig.yaml
+    │   │   ├── data
+    │   │   │   ├── DataObjects.py
+    │   │   │   ├── __init__.py
+    │   │   │   ├── dataset.py
+    │   │   │   ├── wav2mel.py
+    │   │   │   └── wav_preprocessing.py
+    │   │   ├── models
+    │   │   │   ├── __init__.py
+    │   │   │   └── dVecModel.py
+    │   │   ├── speaker_encoder_manager.py
+    │   │   └── utils
+    │   │       ├── Trainer.py
+    │   │       └── __init__.py
+    │   ├── synthesizer
+    │   │   ├── LICENSE.md
+    │   │   ├── __init__.py
+    │   │   ├── configs
+    │   │   │   ├── __init__.py
+    │   │   │   ├── config.py
+    │   │   │   ├── hparams.py
+    │   │   │   └── tacotron_config.yaml
+    │   │   ├── data
+    │   │   │   ├── __init__.py
+    │   │   │   ├── audio.py
+    │   │   │   ├── dataset.py
+    │   │   │   └── preprocess.py
+    │   │   ├── models
+    │   │   │   ├── __init__.py
+    │   │   │   └── tacotron.py
+    │   │   ├── synthesize.py
+    │   │   ├── synthesizer_manager.py
+    │   │   ├── trainer.py
+    │   │   └── utils
+    │   │       ├── __init__.py
+    │   │       ├── cleaners.py
+    │   │       ├── logmmse.py
+    │   │       ├── numbers.py
+    │   │       ├── plot.py
+    │   │       ├── symbols.py
+    │   │       └── text.py
+    │   ├── tts_module_manager.py
+    │   └── vocoder
+    │       ├── __init__.py
+    │       ├── configs
+    │       │   ├── __init__.py
+    │       │   ├── config.py
+    │       │   ├── hparams.py
+    │       │   └── wavernn_config.yaml
+    │       ├── data
+    │       │   ├── __init__.py
+    │       │   ├── dataset.py
+    │       │   └── preprocess.py
+    │       ├── models
+    │       │   ├── __init__.py
+    │       │   └── wavernn.py
+    │       ├── utils
+    │       │   ├── Trainer.py
+    │       │   ├── __init__.py
+    │       │   ├── audio.py
+    │       │   ├── distribution.py
+    │       │   └── gen_wavernn.py
+    │       └── vocoder_manager.py
+    └── utils
+        └── __init__.py
+```
+## Installation 
+Run `pip3 install .` from root directory.
+## Datasets
+We have implemented complete processing for LibraSpeech Dataset for Speaker Encoder, Synthesizer and Vocoder . One can download LibraSpeech dataset via this [link](hhttps://www.openslr.org/12 "link"). Also, for Speaker Encoder we implemented interface to use custom dataset. One need implement `PreprocessDataset` interface functions, `WavPreprocessor` interface functions, `WavPreprocessor` interface functions. Or one can use implemented ones. 
+## Configs
+For baseline models the default configs will be loaded automatically. To change them one can use `update_config(...)` in `osms/common/configs/config.py`. To load default config one can use `get_default_"module_name"_config(...)`. Also, one can implement your own configs to use with other models. 
+## Managers 
+To work with each three modules we implemented its own manager: `SpeakerEncoderManager`, `SynthesizerManager`, `VocoderManager`. As main manager we implemented `MustiSpreakerManager` which give access to all three managers. One can use them to inference the whole TTS model and train each modules separately or together. The example of usage can be found in notebook.
+## Checkpoints
+Baseline checkpoints are uploaded automatically in `checkpoints` directory with creation of 'MultiSpeaker' object. Also, one can use other checkpoints by simple update of config (change ...CHECKPOINT_DIR_PATH, CHECKPOINT_NAME). 
 
+
+
+ 
 ## References
 1. [Ye Jia, Y. Zhang, Ron J. Weiss, Q. Wang, Jonathan Shen, Fei Ren, Z. Chen,P. Nguyen, R. Pang, I. Lopez-Moreno, and Y. Wu.  Transfer learning from speaker verification to multispeaker text-to-speech synthesis,](https://arxiv.org/pdf/1806.04558.pdf) 
 2. [Li  Wan,  Quan  Wang,  Alan  Papir,  and  Ignacio  Lopez  Moreno.   Generalized  end-to-end  loss  for  speaker  verification,](https://arxiv.org/pdf/1710.10467.pdf)
