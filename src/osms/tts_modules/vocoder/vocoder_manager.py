@@ -81,3 +81,8 @@ class VocoderManager(AbstractTTSModuleManager):
         if self.module_configs.MODEL.PRETRAINED:
             self._load_baseline_model()
         return None
+
+    def train(self, run_id, force_restart):
+        self.__init_trainer()
+        self.trainer.train(run_id, force_restart)
+

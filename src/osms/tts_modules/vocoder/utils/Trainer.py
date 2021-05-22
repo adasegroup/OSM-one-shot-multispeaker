@@ -28,7 +28,7 @@ class VocoderTrainer:
         self.ground_truth = self.config.MODEL.GROUND_TRUTH
         self.save_every = self.config.MODEL.SAVE_EVERY
 
-    def train(self, run_id: str, backup_every: int, force_restart: bool):
+    def train(self, run_id: str,  force_restart: bool):
         for p in self.optimizer.param_groups:
             p["lr"] = self.config.MODEL.LR = 1e-4
         loss_func = F.cross_entropy if self.model.mode == "RAW" else discretized_mix_logistic_loss
@@ -86,9 +86,6 @@ class VocoderTrainer:
 
                 step = self.model.get_step()
                 k = step // 1000
-
-                if backup_every != 0 and step % backup_every == 0:
-                    self.model.checkpoint(model_dir, self.optimizer)
 
                 if self.save_every != 0 and step % self.save_every == 0:
                     self.model.save(weights_fpath, self.optimizer)
