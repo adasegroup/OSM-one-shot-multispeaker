@@ -43,9 +43,10 @@ def get_default_main_configs():
     # _C.SPEAKER_VOCODER_CONFIG_FILE = os.path.join("main_configs", "vocoder")
     _C.VOCODER_CONFIG_FILE = None
 
-    _C.SPEAKER_SPEECH_PATH = os.path.join("../audio_samples", "google_test.wav")
-    _C.INPUT_TEXTS_PATH = os.path.join("../texts", "test1.txt")
-    _C.OUTPUT_AUDIO_DIR = os.path.join("../result_speech")
+    _C.SPEAKER_SPEECH_PATH = os.path.join("audio_samples", "google_test.wav")
+    _C.INPUT_TEXTS_PATH = os.path.join("texts", "test1.txt")
+    _C.OUTPUT_AUDIO_DIR = os.path.join("result_speech")
+    _C.OUTPUT_AUDIO_FILE_NAME = "result.wav"
 
     _C.freeze()
     return _C

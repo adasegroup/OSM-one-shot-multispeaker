@@ -44,7 +44,8 @@ class VocoderManager(AbstractTTSModuleManager):
         mel = torch.from_numpy(mel[None, ...])
         wav = self.model.generate(mel, batched, target, overlap, self.module_configs.SP.MU_LAW)
         if do_save_wav:
-            save_wav(wav, os.path.join(self.main_configs.OUTPUT_AUDIO_DIR, 'result.wav'))
+            save_wav(wav, os.path.join(self.main_configs.OUTPUT_AUDIO_DIR,
+                                       self.main_configs.OUTPUT_AUDIO_FILE_NAME))
         return wav
 
     def _load_local_configs(self):

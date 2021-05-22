@@ -68,7 +68,7 @@ class PreprocessLibriSpeechDataset(PreprocessDataset):
 class SpeakerEncoderDataset(Dataset):
     def __init__(self, config):
         self.config = config
-        self.processed_dataset_root = Path(config.DATASET.ROOT).joinpath(config.DATASET.OUTPUT_DIR)
+        self.processed_dataset_root = Path(config.DATASET.OUTPUT_DIR)
         speaker_dirs = [f for f in self.processed_dataset_root.glob("[!.]*") if f.is_dir()]
         if len(speaker_dirs) == 0:
             raise Exception("No speakers found. Make sure you are pointing to the directory "

@@ -62,10 +62,10 @@ class SpeakerEncoderTrainer:
         self.optimizer.step()
         return loss.item()
 
-    def train(self, number_steps):
+    def train(self, number_steps, each_n_print_steps=100):
         for n_step, speaker_batch in enumerate(self.train_dataloader):
             loss_val = self.train_one_step(speaker_batch)
-            if self.step % 10 == 0:
+            if self.step % each_n_print_steps == 1:
                 print(f'Step {self.step}. Train loss value: {loss_val}')
             self.step += 1
             if self.save_n_steps != 0 and n_step % self.save_n_steps == 0:
