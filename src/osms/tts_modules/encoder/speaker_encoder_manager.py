@@ -96,7 +96,6 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
         self.trainer = SpeakerEncoderTrainer(self.module_configs, self.model, self.train_dataloader,
                                              self.test_dataloader, self.optimizer)
 
-
     def train_session(self, number_steps=None):
         self.__init_trainer()
         self.trainer.init_training_session()
@@ -116,7 +115,6 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
 
         return embed
 
-    # TODO: Correct config loading
     def _load_local_configs(self):
         self.module_configs = get_default_encoder_config()
         self.module_configs = update_config(self.module_configs,

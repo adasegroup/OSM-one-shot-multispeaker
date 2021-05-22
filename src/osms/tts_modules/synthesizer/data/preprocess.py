@@ -1,5 +1,5 @@
 from multiprocessing.pool import Pool
-import audio
+from .audio import melspectrogram
 from functools import partial
 from itertools import chain
 from pathlib import Path
@@ -237,7 +237,7 @@ def process_utterance(wav: np.ndarray,
         return None
 
     # Compute the mel spectrogram
-    mel_spectrogram = audio.melspectrogram(wav, configs).astype(np.float32)
+    mel_spectrogram = melspectrogram(wav, configs).astype(np.float32)
     mel_frames = mel_spectrogram.shape[1]
 
     # Skip utterances that are too long

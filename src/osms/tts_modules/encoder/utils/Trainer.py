@@ -60,10 +60,13 @@ class SpeakerEncoderTrainer:
         loss.backward()
         self.model.do_gradient_ops()
         self.optimizer.step()
+        return loss.item()
 
     def train(self, number_steps):
         for n_step, speaker_batch in enumerate(self.train_dataloader):
-            self.train_one_step(speaker_batch)
+            loss_val = self.train_one_step(speaker_batch)
+            if self.step % 10 == 0:
+                print(f'Step {self.step}. Train loss value: {loss_val}')
             self.step += 1
             if self.save_n_steps != 0 and n_step % self.save_n_steps == 0:
                 print("Saving the model (step %d)" % self.step)
@@ -74,7 +77,7 @@ class SpeakerEncoderTrainer:
                 }, os.path.join(self.out_dir, "checkpoints", self.run_id + "_STEP_" + str(self.step) + ".pt"))
 
             if number_steps == n_step:
-                print("Stopping Training Session")
+                print(f"Stopping Training Session at step #{number_steps}")
                 break
 
 

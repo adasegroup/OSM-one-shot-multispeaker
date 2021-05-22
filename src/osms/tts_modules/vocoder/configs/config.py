@@ -27,7 +27,7 @@ def _add_default_wavernn_config(config, freeze=True):
 
     config.MODEL = CN()
     config.MODEL.PRETRAINED = True
-    config.MODEL.CHECKPOINT_DIR_PATH = os.path.join("checkpoints", "vocoder")
+    config.MODEL.CHECKPOINT_DIR_PATH = "checkpoints"
     config.MODEL.CHECKPOINT_NAME = "test"
     # either 'RAW' (softmax on raw bits) or 'MOL' (sample from mixture of logistics)
     config.MODEL.MODE = "RAW"

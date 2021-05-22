@@ -1,3 +1,0 @@
-pretrained: true
-checkpoint_dir_path: "osms/tts_modules/synthesizer/models/checkpoints"
-verbose: true

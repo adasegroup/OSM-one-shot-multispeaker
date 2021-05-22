@@ -4,6 +4,7 @@ import numpy as np
 from .DataObjects import Speaker, RandomCycler, SpeakerBatch
 from pathlib import Path
 
+
 class PreprocessDataset:
     def __init__(self, config, wav_preprocessor, wav2mel_transformer):
         self.config = config
@@ -21,9 +22,9 @@ class PreprocessDataset:
     def process_paths_to_speaker_utterances(self, speaker_dir) -> List:
         raise NotImplementedError
 
-    def preprocess_dataset(self):
-        print(self.speaker_dirs)
-        for speaker_dir in self.speaker_dirs:
+    def preprocess_dataset(self, n_speakers=None):
+        # print(self.speaker_dirs)
+        for idx, speaker_dir in enumerate(self.speaker_dirs):
             speaker_name = "_".join(speaker_dir.relative_to(self.dataset_root).parts)
             speaker_out_dir = self.output_dir.joinpath(speaker_name)
             speaker_out_dir.mkdir(exist_ok=True)
@@ -35,9 +36,11 @@ class PreprocessDataset:
                 out_mel_fpath = out_mel_fpath.replace(".%s" % self.extension, ".npy")
                 out_mel_fpath = speaker_out_dir.joinpath(out_mel_fpath)
 
-
                 self.preprocess_speaker_one_utterance(in_fpath, sources_file, out_mel_fpath)
             sources_file.close()
+            if n_speakers is not None and idx == n_speakers-1:
+                print(f'{n_speakers} speakers were preprocessed.')
+                return None
 
 
 class PreprocessLibriSpeechDataset(PreprocessDataset):

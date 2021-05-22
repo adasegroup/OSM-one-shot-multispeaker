@@ -62,7 +62,7 @@ def _add_default_tacotron_tts_configs(config, freeze=True):
 
     config.MODEL = CN()
     config.MODEL.PRETRAINED = True
-    config.MODEL.CHECKPOINT_DIR_PATH = os.path.join("checkpoints", "synthesizer")
+    config.MODEL.CHECKPOINT_DIR_PATH = "checkpoints"
     config.MODEL.EMBED_DIMS = 512  # Embedding dimension for the graphemes/phoneme inputs
     config.MODEL.ENCODER_DIMS = 256
     config.MODEL.DECODER_DIMS = 128

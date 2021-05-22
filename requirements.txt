@@ -10,7 +10,6 @@ ipython
 ipywidgets
 IProgress
 librosa
-lws
 SoundFile
 inflect
 PyYAML
