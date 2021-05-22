@@ -32,9 +32,9 @@ class SynthesizerTrainer:
     def train(self,
               run_id: str,
               save_every: int,
-              backup_every: int,
-              force_restart: bool
+              backup_every: int
               ):
+        self.model.train()
         self.syn_dir = Path(self.syn_dir)
         self.models_dir = Path(self.models_dir)
         self.models_dir.mkdir(exist_ok=True)
