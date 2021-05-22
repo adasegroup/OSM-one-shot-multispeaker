@@ -39,15 +39,15 @@ The API will also let the users customize modules and pipeline steps without cha
 We will implement several Speaker Encoders (LDE, TDNN) and add them to our framework as well.
 
 ## Project Structure Overview
-From a high point, our project consists of 3 main elements: Speaker Encoder, Synthesizer, Vocoder. For each of them, a manager is implemented that allows one to access the parameters and perform standard actions such as inference. Above them, the we implemented OS MS TTS manager, which brings together all three parts  and allows one to make all pipeline and produce speech with needed voice. Each of these parts is also consist from elementary sub-parts typical for the corresponding elements. They can be described as follows:
- - _Speaker Encoder_: Here the base class is SpeakerEncoderManager, which allows to train(next update) and inference model.Also, we have already  implemented the Wav Audio Preprocessing Interface. So, one can customize their own audio preprocessing functions, which can differ even for the same dataset. Also, the custom model can be used. We added standard preprocessing function and model presented in [Real-Time-Voice-Cloning](https://github.com/CorentinJ/Real-Time-Voice-Cloning "Real-Time-Voice-Cloning") 
- - _Synthesizer_: Here the base class is SynthesizerManager, which allows to train(next update) and inference model. Also, the same sutiation with preprocessing functions, with one difference. In addition to the audio, one also need to process the text. For now, we only implemented text preprocessing function, as this only operation only needed during inference. Also, baseline from [Real-Time-Voice-Cloning](https://github.com/CorentinJ/Real-Time-Voice-Cloning "Real-Time-Voice-Cloning") 
- - _Vocoder_: Here the base class is VocoderManager, which allows to train(next update) and inference model. Also, baseline from [Real-Time-Voice-Cloning](https://github.com/CorentinJ/Real-Time-Voice-Cloning "Real-Time-Voice-Cloning") 
+From a high point, our project consists of 3 main elements: Speaker Encoder, Synthesizer, Vocoder. For each of them, a manager is implemented that allows one to access the parameters and perform standard actions such as inference and training. Above them, we implemented OS MS TTS manager, which brings together all three parts  and allows one to make all pipeline and produce speech with needed voice. Each of these parts is also consist from elementary sub-parts typical for the corresponding elements. They can be described as follows:
+ - _Speaker Encoder_: Here the base class is SpeakerEncoderManager, which allows to train and inference model. Also, we have already  implemented the Wav Audio Preprocessing Interface. So, one can customize their own audio preprocessing functions, which can differ even for the same dataset. Also, the custom model can be used. We added standard preprocessing function and model presented in [Real-Time-Voice-Cloning](https://github.com/CorentinJ/Real-Time-Voice-Cloning "Real-Time-Voice-Cloning") 
+ - _Synthesizer_: Here the base class is SynthesizerManager, which allows to train and inference model. Also, the same situation with preprocessing functions, иге with one difference. In addition to the audio, one also needs to process the text. For now, we implemented text and audio preprocessing function, as these operations are needed during inference and training. The baseline is from [Real-Time-Voice-Cloning](https://github.com/CorentinJ/Real-Time-Voice-Cloning "Real-Time-Voice-Cloning") 
+ - _Vocoder_: Here the base class is VocoderManager, which allows to train, inference vocoder model and to set all the states it needs. The baseline is from [Real-Time-Voice-Cloning](https://github.com/CorentinJ/Real-Time-Voice-Cloning "Real-Time-Voice-Cloning") 
  
  ## Evaluation Results
- In our repository we added notebook, where one can download the voice audio, .txt file and produce speech with cloned voice.
- The weights can be dowloaded [here](https://github.com/blue-fish/Real-Time-Voice-Cloning/releases/download/v1.0/pretrained.zip "load weights")
- Other instructions are in notebook [here](https://github.com/adasegroup/OSM-one-shot-multispeaker/blob/main/notebooks/demonstration.ipynb " notebook")
+ In our repository we added notebook, where one can upload the voice audio, .txt file and produce speech with cloned voice.
+ Despite the weights of pretrained models are downloaded automatically at the first run, the user can still download archive [here](https://github.com/blue-fish/Real-Time-Voice-Cloning/releases/download/v1.0/pretrained.zip "load weights")
+ Other instructions are in the notebook [here](https://github.com/adasegroup/OSM-one-shot-multispeaker/blob/main/notebooks/demonstration.ipynb " notebook")
  
 
 
@@ -144,13 +144,13 @@ Gleb will implement the working stack of models, write documentations and usage 
 ## Installation 
 Run `pip3 install .` from root directory.
 ## Datasets
-We have implemented complete processing for LibraSpeech Dataset for Speaker Encoder, Synthesizer and Vocoder . One can download LibraSpeech dataset via this [link](hhttps://www.openslr.org/12 "link"). Also, for Speaker Encoder we implemented interface to use custom dataset. One need implement `PreprocessDataset` interface functions, `WavPreprocessor` interface functions, `WavPreprocessor` interface functions. Or one can use implemented ones. 
+We have implemented complete processing for LibraSpeech Dataset for Speaker Encoder, Synthesizer and Vocoder . One can download LibraSpeech dataset via this [link](hhttps://www.openslr.org/12 "link"). Also, for Speaker Encoder we implemented interface to use custom dataset. One needs to implement `PreprocessDataset` interface functions, `WavPreprocessor` interface functions, `WavPreprocessor` interface functions, or use implemented ones. 
 ## Configs
-For baseline models the default configs will be loaded automatically. To change them one can use `update_config(...)` in `osms/common/configs/config.py`. To load default config one can use `get_default_"module_name"_config(...)`. Also, one can implement your own configs to use with other models. 
+For baseline models the default configs will be loaded automatically. To change them one can use `update_config(...)` in `osms/common/configs/config.py`. To load default config one can use `get_default_<module_name>_config(...)`. Also, one can implement his own configs to use them for other models. 
 ## Managers 
 To work with each three modules we implemented its own manager: `SpeakerEncoderManager`, `SynthesizerManager`, `VocoderManager`. As main manager we implemented `MustiSpreakerManager` which give access to all three managers. One can use them to inference the whole TTS model and train each modules separately or together. The example of usage can be found in notebook.
 ## Checkpoints
-Baseline checkpoints are uploaded automatically in `checkpoints` directory with creation of 'MultiSpeaker' object. Also, one can use other checkpoints by simple update of config (change ...CHECKPOINT_DIR_PATH, CHECKPOINT_NAME). 
+Baseline checkpoints are downloaded automatically in `checkpoints` directory with creation of 'MultiSpeaker' object. Also, one can use other checkpoints by simple updating of config (change ...CHECKPOINT_DIR_PATH, CHECKPOINT_NAME). 
 
 
 
