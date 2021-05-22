@@ -104,6 +104,14 @@ def _add_default_data_processing_configs(config, freeze=True):
         config.defrost()
 
     config.DATA = CN()
+    config.DATA.DATASET_ROOT_PATH = ""
+    config.DATA.OUT_DIR = os.path.join(config.DATA.DATASET_ROOT_PATH, "SV2TTS", "synthesizer")
+    config.DATA.DATASETS_NAME = "LibriSpeech"
+    config.DATA.SUBFOLDERS = "train-clean-100, train-clean-360"
+    config.DATA.NO_ALIGNMENTS = True
+    config.DATA.SKIP_EXISTING = True
+    config.DATA.N_PROCESSES = 1
+
     config.DATA.MAX_MEL_FRAMES = 900
     config.DATA.RESCALE = True
     config.DATA.RESCALING_MAX = 0.9
