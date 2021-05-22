@@ -31,7 +31,7 @@ class SpeakerEncoderTrainer:
         if not os.path.exists(os.path.join(self.out_dir, "checkpoints")):
             os.mkdir(os.path.join(self.out_dir, "checkpoints"))
 
-        if self.module_configs.TRAIN.CHECKPOINT_NAME is not None:
+        if self.config.TRAIN.CHECKPOINT_NAME is not None:
             if self.checkpoint_path.exists():
                 print("Found existing model \"%s\", loading it and resuming training." % self.run_id)
                 checkpoint = torch.load(self.checkpoint_path)
