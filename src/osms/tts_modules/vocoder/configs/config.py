@@ -24,6 +24,7 @@ def _add_default_wavernn_config(config, freeze=True):
     config.MODEL = CN()
     config.MODEL.PRETRAINED = True
     config.MODEL.CHECKPOINT_DIR_PATH = os.path.join("checkpoints", "vocoder")
+    config.MODEL.CHECKPOINT_NAME = "test"
     # either 'RAW' (softmax on raw bits) or 'MOL' (sample from mixture of logistics)
     config.MODEL.MODE = "RAW"
     # NB - this needs to correctly factorise hop_length
@@ -49,6 +50,10 @@ def _add_default_wavernn_config(config, freeze=True):
     # target number of samples to be generated in each batch entry
     config.MODEL.TARGET = 8000
     config.MODEL.OVERLAP = 400
+
+    config.DATASET.METADATA_PATH = ""
+    config.DATASET.MEL_DIR = ""
+    config.DATASET.WAV_DIR = ""
 
     if freeze:
         config.freeze()
