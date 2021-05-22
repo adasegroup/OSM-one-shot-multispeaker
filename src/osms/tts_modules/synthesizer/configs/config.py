@@ -80,12 +80,12 @@ def _add_default_tacotron_tts_configs(config, freeze=True):
     # where r = reduction factor (# of mel frames synthesized for each decoder iteration),
     # lr = learning rate
     config.MODEL.SCHEDULE = [(2, 1e-3, 20_000, 12),
-                       (2, 5e-4, 40_000, 12),
-                       (2, 2e-4, 80_000, 12),
-                       (2, 1e-4, 160_000, 12),
-                       (2, 3e-5, 320_000, 12),
-                       (2, 1e-5, 640_000, 12)
-                       ]
+                             (2, 5e-4, 40_000, 12),
+                             (2, 2e-4, 80_000, 12),
+                             (2, 1e-4, 160_000, 12),
+                             (2, 3e-5, 320_000, 12),
+                             (2, 1e-5, 640_000, 12)
+                             ]
     # Clips the gradient norm to prevent explosion
     # Set to None if not needed
     config.MODEL.CLIP_GRAD_NORM = 1.0
@@ -105,7 +105,7 @@ def _add_default_data_processing_configs(config, freeze=True):
 
     config.DATA = CN()
     config.DATA.DATASET_ROOT_PATH = ""
-    config.DATA.OUT_DIR = os.path.join(config.DATA.DATASET_ROOT_PATH, "SV2TTS", "synthesizer")
+    config.DATA.SYN_DIR = os.path.join(config.DATA.DATASET_ROOT_PATH, "SV2TTS", "synthesizer")
     config.DATA.DATASETS_NAME = "LibriSpeech"
     config.DATA.SUBFOLDERS = "train-clean-100, train-clean-360"
     config.DATA.NO_ALIGNMENTS = True

@@ -13,7 +13,7 @@ class SynthesizerPreprocessor:
     def __init__(self, configs, encoder_manager):
         self.configs = configs
         self.datasets_root = Path(self.configs.DATA.DATASET_ROOT_PATH)
-        self.out_dir = Path(self.configs.DATA.OUT_DIR)
+        self.out_dir = Path(self.configs.DATA.SYN_DIR)
         self.datasets_name = self.configs.DATA.DATASETS_NAME
         self.subfolders = self.configs.DATA.SUBFOLDERS
         self.no_alignments = self.configs.DATA.NO_ALIGNMENTS

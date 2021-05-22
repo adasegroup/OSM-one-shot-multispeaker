@@ -13,6 +13,10 @@ def get_default_vocoder_config():
     # Add WaveRNN model main_configs
     _C = _add_default_wavernn_config(_C, freeze=False)
 
+    _C.DATA = CN()
+    _C.DATA.DATASET_ROOT_PATH = ""
+    _C.DATA.SYN_DIR = os.path.join(_C.DATA.DATASET_ROOT_PATH, "SV2TTS", "vocoder")
+
     _C.freeze()
     return _C
 
@@ -50,10 +54,6 @@ def _add_default_wavernn_config(config, freeze=True):
     # target number of samples to be generated in each batch entry
     config.MODEL.TARGET = 8000
     config.MODEL.OVERLAP = 400
-
-    config.DATASET.METADATA_PATH = ""
-    config.DATASET.MEL_DIR = ""
-    config.DATASET.WAV_DIR = ""
 
     if freeze:
         config.freeze()
