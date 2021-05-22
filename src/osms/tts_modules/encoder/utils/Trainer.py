@@ -21,7 +21,6 @@ class SpeakerEncoderTrainer:
         self.save_n_steps = self.config.TRAIN.SAVE_N_STEPS
         self.out_dir = self.config.TRAIN.OUT_DIR
 
-        self.out_checkpoints_dir = self.config.TRAIN.OUT_DIR
         self.run_id = self.config.TRAIN.RUN_ID
 
     def init_training_session(self):

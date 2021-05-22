@@ -5,18 +5,17 @@ import torch
 
 
 class VocoderDataset(Dataset):
-    def __init__(self, config):
+    def __init__(self, config, metadata_fpath, mel_dir, wav_dir):
         self.config = config
-        print("Using inputs from:\n\t%s\n\t%s\n\t%s" % (self.config.DATASET.METADATA_PATH,
-                                                        self.config.DATASET.MEL_DIR, self.config.DATASET.WAV_DIR))
+        print("Using inputs from:\n\t%s\n\t%s\n\t%s" % (metadata_fpath, mel_dir, wav_dir))
 
-        with self.config.DATASET.METADATA_PATH.open("r") as metadata_file:
+        with metadata_fpath.open("r") as metadata_file:
             metadata = [line.split("|") for line in metadata_file]
 
         gta_fnames = [x[1] for x in metadata if int(x[4])]
-        gta_fpaths = [self.config.DATASET.MEL_DIR.joinpath(fname) for fname in gta_fnames]
+        gta_fpaths = [mel_dir.joinpath(fname) for fname in gta_fnames]
         wav_fnames = [x[0] for x in metadata if int(x[4])]
-        wav_fpaths = [self.config.DATASET.WAV_DIR.joinpath(fname) for fname in wav_fnames]
+        wav_fpaths = [wav_dir.joinpath(fname) for fname in wav_fnames]
         self.samples_fpaths = list(zip(gta_fpaths, wav_fpaths))
 
         print("Found %d samples" % len(self.samples_fpaths))

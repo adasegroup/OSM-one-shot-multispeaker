@@ -42,6 +42,8 @@ def _add_default_wavernn_config(config, freeze=True):
     # Training
     config.MODEL.BATCH_SIZE = 100
     config.MODEL.LR = 1e-4
+    config.MODEL.SAVE_EVERY = 5
+    config.MODEL.GROUND_TRUTH = True
     # number of samples to generate at each checkpoint
     config.MODEL.GEN_AT_CHECKPOINT = 5
     # this will pad the input so that the resnet can 'see' wider than input length

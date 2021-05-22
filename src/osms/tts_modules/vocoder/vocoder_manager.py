@@ -3,6 +3,7 @@ from .models import WaveRNN
 from .configs import get_default_vocoder_config
 from osms.common.configs import update_config
 from .utils.audio import save_wav
+from .utils.Trainer import VocoderTrainer
 import torch
 import os
 
@@ -19,6 +20,7 @@ class VocoderManager(AbstractTTSModuleManager):
                                              test_dataloader,
                                              train_dataloader
                                              )
+        self.trainer = None
 
     def infer_waveform(self, mel, normalize=True, batched=True,
                        target=8000, overlap=800, do_save_wav=True):
@@ -51,6 +53,13 @@ class VocoderManager(AbstractTTSModuleManager):
                                             update_file=self.main_configs.VOCODER_CONFIG_FILE
                                             )
         return None
+
+    def __init_trainer(self):
+        if self.model is None:
+            self._init_baseline_model()
+        if self.optimizer is None:
+            self.optimizer = torch.optim.Adam(self.model.parameters())
+        self.trainer = VocoderTrainer(self.module_configs, self.model, self.optimizer)
 
     def _init_baseline_model(self):
         self.model_name = "WaveRNN"
