@@ -54,7 +54,97 @@ From a high point, our project consists of 3 main elements: Speaker Encoder, Syn
 ## Roles of the Participants
 Nikolay will design the modular architecture, API for external usage and training pipeline.
 Gleb will implement the working stack of models, write documentations and usage examples.
+## Project Structure 
+```bash
+.
+└── osms
+    ├── __init__.py
+    ├── common
+    │   ├── __init__.py
+    │   ├── configs
+    │   │   ├── __init__.py
+    │   │   ├── config.py
+    │   │   └── main_config.yaml
+    │   └── multispeaker.py
+    ├── main.py
+    ├── tts_modules
+    │   ├── __init__.py
+    │   ├── encoder
+    │   │   ├── __init__.py
+    │   │   ├── configs
+    │   │   │   ├── AudioConfig.yaml
+    │   │   │   ├── __init__.py
+    │   │   │   ├── config.py
+    │   │   │   └── dVecModelConfig.yaml
+    │   │   ├── data
+    │   │   │   ├── DataObjects.py
+    │   │   │   ├── __init__.py
+    │   │   │   ├── dataset.py
+    │   │   │   ├── wav2mel.py
+    │   │   │   └── wav_preprocessing.py
+    │   │   ├── models
+    │   │   │   ├── __init__.py
+    │   │   │   └── dVecModel.py
+    │   │   ├── speaker_encoder_manager.py
+    │   │   └── utils
+    │   │       ├── Trainer.py
+    │   │       └── __init__.py
+    │   ├── synthesizer
+    │   │   ├── LICENSE.md
+    │   │   ├── __init__.py
+    │   │   ├── configs
+    │   │   │   ├── __init__.py
+    │   │   │   ├── config.py
+    │   │   │   ├── hparams.py
+    │   │   │   └── tacotron_config.yaml
+    │   │   ├── data
+    │   │   │   ├── __init__.py
+    │   │   │   ├── audio.py
+    │   │   │   ├── dataset.py
+    │   │   │   └── preprocess.py
+    │   │   ├── models
+    │   │   │   ├── __init__.py
+    │   │   │   └── tacotron.py
+    │   │   ├── synthesize.py
+    │   │   ├── synthesizer_manager.py
+    │   │   ├── trainer.py
+    │   │   └── utils
+    │   │       ├── __init__.py
+    │   │       ├── cleaners.py
+    │   │       ├── logmmse.py
+    │   │       ├── numbers.py
+    │   │       ├── plot.py
+    │   │       ├── symbols.py
+    │   │       └── text.py
+    │   ├── tts_module_manager.py
+    │   └── vocoder
+    │       ├── __init__.py
+    │       ├── configs
+    │       │   ├── __init__.py
+    │       │   ├── config.py
+    │       │   ├── hparams.py
+    │       │   └── wavernn_config.yaml
+    │       ├── data
+    │       │   ├── __init__.py
+    │       │   ├── dataset.py
+    │       │   └── preprocess.py
+    │       ├── models
+    │       │   ├── __init__.py
+    │       │   └── wavernn.py
+    │       ├── utils
+    │       │   ├── Trainer.py
+    │       │   ├── __init__.py
+    │       │   ├── audio.py
+    │       │   ├── distribution.py
+    │       │   └── gen_wavernn.py
+    │       └── vocoder_manager.py
+    └── utils
+        └── __init__.py
+```
+## Installation 
+Run `pip3 install .` from root directory.
 
+ 
 ## References
 1. [Ye Jia, Y. Zhang, Ron J. Weiss, Q. Wang, Jonathan Shen, Fei Ren, Z. Chen,P. Nguyen, R. Pang, I. Lopez-Moreno, and Y. Wu.  Transfer learning from speaker verification to multispeaker text-to-speech synthesis,](https://arxiv.org/pdf/1806.04558.pdf) 
 2. [Li  Wan,  Quan  Wang,  Alan  Papir,  and  Ignacio  Lopez  Moreno.   Generalized  end-to-end  loss  for  speaker  verification,](https://arxiv.org/pdf/1710.10467.pdf)
