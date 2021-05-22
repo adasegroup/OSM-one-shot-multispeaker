@@ -15,7 +15,7 @@ def get_default_vocoder_config():
 
     _C.DATA = CN()
     _C.DATA.DATASET_ROOT_PATH = ""
-    _C.DATA.SYN_DIR = os.path.join(_C.DATA.DATASET_ROOT_PATH, "SV2TTS", "vocoder")
+    _C.DATA.VOC_DIR = os.path.join(_C.DATA.DATASET_ROOT_PATH, "SV2TTS", "vocoder")
 
     _C.freeze()
     return _C
