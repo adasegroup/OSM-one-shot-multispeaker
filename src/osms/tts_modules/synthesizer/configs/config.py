@@ -10,7 +10,7 @@ def get_default_synthesizer_config():
     """
 
     _C = CN()
-    _C.VERBOSE = True
+    _C.VERBOSE = False
 
     # Signal Processing (used in both synthesizer and vocoder)
     _C = add_default_signal_processing_config(_C, freeze=False)

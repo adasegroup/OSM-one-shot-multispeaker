@@ -9,7 +9,7 @@ def get_default_encoder_config():
     :return: Instance of CfgNode
     """
     _C = CN()
-    _C.VERBOSE = True
+    _C.VERBOSE = False
     _C.DEVICE = 'cpu'
 
     _C.AUDIO = CN()

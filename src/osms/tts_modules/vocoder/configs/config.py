@@ -10,7 +10,7 @@ def get_default_vocoder_config():
     :return: Instance of CfgNode
     """
     _C = CN()
-    _C.VERBOSE = True
+    _C.VERBOSE = False
 
     # Add Signal Processing main_configs (used in both synthesizer and vocoder)
     _C = _add_default_signal_processing_config(_C, freeze=False)
