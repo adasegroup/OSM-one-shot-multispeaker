@@ -3,7 +3,19 @@ import os
 
 
 class SpeakerEncoderTrainer:
+    """
+    The class-manager used to train the Speaker Encoder model
+    """
+
     def __init__(self, config, model, train_dataloader, test_loader, optimizer):
+        """
+        :param config: Speaker encoder yacs configurations
+        :param model: Speaker encoder model
+        :param train_dataloader: Train dataloader
+        :param test_loader: Test dataloader
+        :param optimizer: Optimizer used during training
+        """
+
         self.config = config
         self.model = model
         self.train_dataloader = train_dataloader
@@ -24,6 +36,13 @@ class SpeakerEncoderTrainer:
         self.run_id = self.config.TRAIN.RUN_ID
 
     def init_training_session(self):
+        """
+        Inits the training procedure: creates necessary directories,
+        load checkpoints and optimizer state if defined in configs
+
+        :return: None
+        """
+
         if not os.path.exists(self.out_dir):
             os.mkdir(self.out_dir)
 
@@ -49,6 +68,13 @@ class SpeakerEncoderTrainer:
         return loss, eer
 
     def train_one_step(self, speaker_batch):
+        """
+        One training step
+
+        :param speaker_batch: Batch of input data
+        :return: Values of loss at this step
+        """
+
         self.model.train()
         inputs = torch.from_numpy(speaker_batch.data).to(self.device)
         embeds = self.model(inputs)
@@ -63,6 +89,14 @@ class SpeakerEncoderTrainer:
         return loss.item()
 
     def train(self, number_steps, each_n_print_steps=100):
+        """
+        Main training method
+
+        :param number_steps: Number of training steps
+        :param each_n_print_steps: Optional. Print the loss value each each_n_print_steps steps
+        :return: None
+        """
+
         for n_step, speaker_batch in enumerate(self.train_dataloader):
             loss_val = self.train_one_step(speaker_batch)
             if self.step % each_n_print_steps == 1:
@@ -79,7 +113,4 @@ class SpeakerEncoderTrainer:
             if number_steps == n_step:
                 print(f"Stopping Training Session at step #{number_steps}")
                 break
-
-
-
-
+        return None

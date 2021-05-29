@@ -6,11 +6,24 @@ from ..utils.text import text_to_sequence
 
 
 class SynthesizerDataset(Dataset):
+    """
+    The Dataset child class with implementations for Synthesizer needs
+    """
+
     def __init__(self,
                  metadata_fpath: Path,
                  mel_dir: Path,
                  embed_dir: Path,
                  configs):
+        """
+        Constructor
+
+        :param metadata_fpath: Path to metadata
+        :param mel_dir: Path to the directory with wel-spectrograms
+        :param embed_dir: Path to the directory with embeddings
+        :param configs: Synthesizer yacs configs
+        """
+
         print("Using inputs from:\n\t%s\n\t%s\n\t%s" % (metadata_fpath, mel_dir, embed_dir))
 
         with metadata_fpath.open("r") as metadata_file:

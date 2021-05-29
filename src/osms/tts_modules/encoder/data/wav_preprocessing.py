@@ -14,7 +14,10 @@ except:
 
 
 class WavPreprocessor:
-    """Interface """
+    """
+    Interface for preprocessing the wav files
+    """
+
     def __init__(self, config):
         self.config = config
 
@@ -33,6 +36,7 @@ class StandardAudioPreprocessor(WavPreprocessor):
         """
         Ensures that segments without voice in the waveform remain no longer than a
         threshold determined by the VAD parameters in params.py.
+
         :param wav: the raw waveform as a numpy array of floats
         :return: the same waveform with silences trimmed away (length <= original wav length)
         """
@@ -91,12 +95,16 @@ class StandardAudioPreprocessor(WavPreprocessor):
         """
         Applies the preprocessing operations used in training the Speaker Encoder to a waveform
         either on disk or in memory. The waveform will be resampled to match the data hyperparameters.
+
+        :param trim_silence: Flag defines whether to trim long silences or not
+        :param normalize: Flag defines whether to normalize volume or not
         :param fpath_or_wav: either a filepath to an audio file (many extensions are supported, not
         just .wav), either the waveform as a numpy array of floats.
         :param source_sr: if passing an audio waveform, the sampling rate of the waveform before
         preprocessing. After preprocessing, the waveform's sampling rate will match the data
         hyperparameters. If passing a filepath, the sampling rate will be automatically detected and
         this argument will be ignored.
+        :return wav: resulting wav object
         """
 
         sampling_rate = self.config.AUDIO.SAMPLING_RATE

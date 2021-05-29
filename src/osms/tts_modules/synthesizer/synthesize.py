@@ -11,6 +11,13 @@ import requests
 
 
 def run_synthesis(out_dir, config):
+    """
+    Genertes GTA mels
+
+    :param out_dir: The directory where the resuting GTA mels will be save
+    :param config: Synthesizer yacs config
+    :return: None
+    """
     # Generate ground truth-aligned mels for vocoder training
     in_dir = config.DATA.SYN_DIR
     synth_dir = Path(out_dir).joinpath("mels_gta")
@@ -87,6 +94,7 @@ def run_synthesis(out_dir, config):
 
                 # Write metadata into the synthesized file
                 file.write("|".join(dataset.metadata[k]))
+    return None
 
 
 def load_tacotron_model(model, config, device):

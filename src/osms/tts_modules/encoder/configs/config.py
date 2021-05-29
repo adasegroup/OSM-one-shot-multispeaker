@@ -3,6 +3,11 @@ import os
 
 
 def get_default_encoder_config():
+    """
+    Creates the configuration CfgNode object for Speaker Encoder and fills it with default values
+
+    :return: Instance of CfgNode
+    """
     _C = CN()
     _C.VERBOSE = True
     _C.DEVICE = 'cpu'

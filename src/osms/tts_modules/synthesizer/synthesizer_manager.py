@@ -12,6 +12,41 @@ import numpy as np
 
 
 class SynthesizerManager(AbstractTTSModuleManager):
+    """
+    The main manager class which controls the synthesizer model,
+    the corresponding datasets and dataloaders and the training and inference procedures.
+
+    Attributes
+    ----------
+    main_configs: yacs.config.CfgNode
+        main configurations
+    module_configs: yacs.config.CfgNode
+        Synthesizer configurations
+    preprocessor: SynthesizerPreprocessor
+        preprocess the datasets
+    model: nn.Module
+        Synthesizer NN model
+    model_name: str
+        Name of the model
+    encoder_manager: SpeakerEncoderManager
+        SpeakerEncoderManager instance
+
+    Methods
+    -------
+    _init_baseline_model()
+        initialize baseline model
+
+    synthesize_spectrograms()
+         Synthesizes mel spectrograms from texts and speaker embeddings
+
+    save_spectrograms()
+        Saves mel spectrograms to the file
+
+    _load_local_configs()
+        Loads yacs configs for Synthesizer
+
+    """
+
     def __init__(self,
                  main_configs,
                  model=None,
@@ -42,6 +77,7 @@ class SynthesizerManager(AbstractTTSModuleManager):
                                 do_save_spectrograms=True):
         """
         Synthesizes mel spectrograms from texts and speaker embeddings.
+
         :param texts: a list of N text prompts to be synthesized
         :param embeddings: a numpy array or list of speaker embeddings of shape (N, 256)
         :param return_alignments: if True, a matrix representing the alignments between the

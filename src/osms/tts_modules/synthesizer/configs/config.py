@@ -3,6 +3,12 @@ from yacs.config import CfgNode as CN
 
 
 def get_default_synthesizer_config():
+    """
+    Creates the configuration CfgNode object for Synthesizer and fills it with default values
+
+    :return: Instance of CfgNode
+    """
+
     _C = CN()
     _C.VERBOSE = True
 
@@ -32,10 +38,12 @@ def add_default_signal_processing_config(config, freeze=True):
     """
     Adds SP CfgNode to :param config: containing signal processing parameters.
     Signal Processing parameters are used in both synthesizer and vocoder.
+
     :param config: Synthesizer or Vocoder config
     :param freeze: Flag defines whether to freeze :param config: after adding SP CfgNode
     :return: updated config
     """
+
     if config.is_frozen():
         config.defrost()
     config.SP = CN()
@@ -57,6 +65,14 @@ def add_default_signal_processing_config(config, freeze=True):
 
 
 def _add_default_tacotron_tts_configs(config, freeze=True):
+    """
+    Adds basic configurations for Tacotron
+
+    :param config: Synthesizer config
+    :param freeze: Flag defines whether to freeze the configs after updating or nor
+    :return: updated config
+    """
+
     if config.is_frozen():
         config.defrost()
 
@@ -100,6 +116,14 @@ def _add_default_tacotron_tts_configs(config, freeze=True):
 
 
 def _add_default_data_processing_configs(config, freeze=True):
+    """
+    Adds basic configurations for data nad preprocessing
+
+    :param config: Synthesizer config
+    :param freeze: Flag defines whether to freeze the configs after updating or nor
+    :return: updated config
+    """
+
     if config.is_frozen():
         config.defrost()
 
@@ -123,6 +147,14 @@ def _add_default_data_processing_configs(config, freeze=True):
 
 
 def _add_default_mel_configs(config, freeze=True):
+    """
+    Adds basic configurations for mel-spectrograms processing
+
+    :param config: Synthesizer config
+    :param freeze: Flag defines whether to freeze the configs after updating or nor
+    :return: updated config
+    """
+
     if config.is_frozen():
         config.defrost()
 
@@ -137,6 +169,14 @@ def _add_default_mel_configs(config, freeze=True):
 
 
 def _add_default_audio_configs(config, freeze=True):
+    """
+    Adds basic configurations for audio processing
+
+    :param config: Synthesizer config
+    :param freeze: Flag defines whether to freeze the configs after updating or nor
+    :return: updated config
+    """
+
     if config.is_frozen():
         config.defrost()
 
@@ -154,6 +194,14 @@ def _add_default_audio_configs(config, freeze=True):
 
 
 def _add_default_sv2tts_configs(config, freeze=True):
+    """
+    Adds basic configurations for SV2TTS processing
+
+    :param config: Synthesizer config
+    :param freeze: Flag defines whether to freeze the configs after updating or nor
+    :return: updated config
+    """
+
     if config.is_frozen():
         config.defrost()
 

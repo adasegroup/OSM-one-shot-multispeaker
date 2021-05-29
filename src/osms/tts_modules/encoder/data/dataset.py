@@ -6,6 +6,12 @@ from pathlib import Path
 
 
 class PreprocessDataset:
+    """
+    The abstract class for dataset preprocessing.
+    The methods preprocess_speaker_one_utterance(..) and process_paths_to_speaker_utterances(..)
+    must be implemented in child classes.
+    """
+
     def __init__(self, config, wav_preprocessor, wav2mel_transformer):
         self.config = config
         self.dataset_root = Path(config.DATASET.ROOT)
@@ -23,6 +29,13 @@ class PreprocessDataset:
         raise NotImplementedError
 
     def preprocess_dataset(self, n_speakers=None):
+        """
+        The main method for preprocessing the dataset.
+
+        :param n_speakers: Optional. Number of speakers
+        :return: None
+        """
+
         # print(self.speaker_dirs)
         for idx, speaker_dir in enumerate(self.speaker_dirs):
             speaker_name = "_".join(speaker_dir.relative_to(self.dataset_root).parts)
@@ -44,6 +57,11 @@ class PreprocessDataset:
 
 
 class PreprocessLibriSpeechDataset(PreprocessDataset):
+    """
+    The child class of abstract PreprocessDataset class.
+    Contains the specific realizations of preprocess_speaker_one_utterance(..)
+    and process_paths_to_speaker_utterances(..) for LibriSpeech dataset.
+    """
 
     def __init__(self, config, wav_preprocessor, wav2mel_transformer):
         super(PreprocessLibriSpeechDataset, self).__init__(config, wav_preprocessor, wav2mel_transformer)
@@ -52,7 +70,6 @@ class PreprocessLibriSpeechDataset(PreprocessDataset):
         return speaker_dir.glob("**/*.%s" % self.extension)
 
     def preprocess_speaker_one_utterance(self, in_fpath, sources_file, out_mel_fpath):
-
         wav = self.wav_preprocessor.preprocess_wav(in_fpath)
         if len(wav) == 0:
             return None
@@ -66,6 +83,10 @@ class PreprocessLibriSpeechDataset(PreprocessDataset):
 
 
 class SpeakerEncoderDataset(Dataset):
+    """
+    The Dataset child class with implementations for Speaker Encoder needs
+    """
+
     def __init__(self, config):
         self.config = config
         self.processed_dataset_root = Path(config.DATASET.OUTPUT_DIR)
@@ -84,6 +105,10 @@ class SpeakerEncoderDataset(Dataset):
 
 
 class SpeakerEncoderDataLoader(DataLoader):
+    """
+    The data loader class for SpeakerEncoderDataset with implementations for Speaker Encoder needs
+    """
+
     def __init__(self, config, dataset, mode, sampler=None,
                  batch_sampler=None, num_workers=0, pin_memory=False, timeout=0,
                  worker_init_fn=None):

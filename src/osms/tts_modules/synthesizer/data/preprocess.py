@@ -10,6 +10,26 @@ import librosa
 
 
 class SynthesizerPreprocessor:
+    """
+    The class which controls the preprocessing procedure of datasets for Synthesizer
+
+    Attributes
+    -----------
+    configs: Synthesizer yacs config
+    datasets_root: The path to the root of the dataset
+    out_dir: The path to the output results
+    datasets_name: The name of the dataset
+    subfolders: Subfolders in the dataset
+    no_alignments: Flag determines whether to do alignments or not
+    skip_existing: Flag determines whether to skip existing utterances or not
+    n_processes: Number of processes
+    encoder_manager: SpeakerEncoderManger object
+
+    Methods
+    -----------
+    preprocess_dataset()
+        The main method where all the preprocessing steps are done sequentially
+    """
     def __init__(self, configs, encoder_manager):
         self.configs = configs
         self.datasets_root = Path(self.configs.DATA.DATASET_ROOT_PATH)
@@ -22,6 +42,11 @@ class SynthesizerPreprocessor:
         self.encoder_manager = encoder_manager
 
     def preprocess_dataset(self):
+        """
+        The main method where all the preprocessing steps are done sequentially
+
+        :return: None
+        """
         # Gather the input directories
         dataset_root = self.datasets_root.joinpath(self.datasets_name)
         input_dirs = [dataset_root.joinpath(subfolder.strip()) for subfolder in self.subfolders.split(",")]

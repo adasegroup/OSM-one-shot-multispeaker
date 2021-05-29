@@ -4,7 +4,6 @@ import torch.nn.functional as F
 import numpy as np
 from ..utils.distribution import sample_from_discretized_mix_logistic
 from ..utils.audio import *
-from ..configs import hparams as hp
 
 
 class ResBlock(nn.Module):
@@ -87,9 +86,14 @@ class UpsampleNetwork(nn.Module):
 
 
 class WaveRNN(nn.Module):
+    """
+    Default Vocoder model
+    """
+
     def __init__(self, rnn_dims, fc_dims, bits, pad, upsample_factors,
                  feat_dims, compute_dims, res_out_dims, res_blocks,
-                 hop_length, sample_rate, device, mode='RAW', verbose=False):
+                 hop_length, sample_rate, device, mode='RAW', apply_preemphasis=True,
+                 verbose=False):
         super().__init__()
         self.device = device
         self.mode = mode
@@ -105,6 +109,7 @@ class WaveRNN(nn.Module):
         self.aux_dims = res_out_dims // 4
         self.hop_length = hop_length
         self.sample_rate = sample_rate
+        self.apply_preemphasis = apply_preemphasis
 
         self.upsample = UpsampleNetwork(feat_dims, upsample_factors, compute_dims, res_blocks, res_out_dims, pad)
         self.I = nn.Linear(feat_dims + self.aux_dims + 1, rnn_dims)
@@ -241,7 +246,7 @@ class WaveRNN(nn.Module):
 
         if mu_law:
             output = decode_mu_law(output, self.n_classes, False)
-        if hp.apply_preemphasis:
+        if self.apply_preemphasis:
             output = de_emphasis(output)
 
         # Fade-out at the end to avoid signal cutting out suddenly

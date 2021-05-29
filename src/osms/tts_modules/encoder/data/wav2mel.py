@@ -6,11 +6,13 @@ class Wav2MelTransform:
     """
     Interface for deriving a mel spectrogram ready to be used by the encoder from a preprocessed audio waveform.
     """
+
     def __init__(self, config):
         """
         attributes:
             audio_config - Audio Configuration file
         """
+
         self.config = config
 
     def __call__(self, *args, **kwargs):
@@ -28,6 +30,7 @@ class StandardWav2MelTransform(Wav2MelTransform):
     """
     Standard wav to mel spectogram tranformer (baseline)
     """
+
     def __init__(self, config):
         super(StandardWav2MelTransform, self).__init__(config)
 
@@ -36,6 +39,7 @@ class StandardWav2MelTransform(Wav2MelTransform):
         Derives a mel spectrogram ready to be used by the encoder from a preprocessed audio waveform
         using Librosa implementation.
         """
+
         sampling_rate = self.config.AUDIO.SAMPLING_RATE
         mel_window_length = self.config.AUDIO.MEL_WINDOW_LENGTH
         mel_window_step = self.config.AUDIO.MEL_WINDOW_STEP

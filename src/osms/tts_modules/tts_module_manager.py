@@ -4,6 +4,48 @@ import os
 
 
 class AbstractTTSModuleManager:
+    """
+    An abstract class used as a basis for particular module managers
+
+    Attributes
+    -----------
+    main_configs: yacs.config.CfgNode
+        main configurations
+    module_configs: yacs.config.CfgNode
+        module configurations
+    model: torch.nn.Module
+        Pytorch NN model
+    model_name: str
+        Name of the model
+    optimizer: nn.optim.Optimizer
+        Pytorch optimizer
+    test_dataloader: torch.utils.data.Dataloader
+        Test dataloader
+    train_dataloader: torch.utils.data.Dataloader
+        Train dataloader
+
+    Methods
+    ------------
+    load_model(...)
+        Loads the weights of the model from the local checkpoint or download the checkpoint if url is given
+
+    save_model(..)
+        Saves the state of the model and optimizer
+
+    _load_local_configs()
+        Loads yacs configs for the module
+
+    _init_baseline_model()
+        Initializes baseline model
+
+    _load_baseline_model()
+        Load the checkpoint for the baseline model
+
+    __load_from_dropbox()
+        Downloads the checkpoint from the Dropbox link
+
+    """
+
     def __init__(self,
                  main_configs,
                  model=None,
@@ -27,6 +69,14 @@ class AbstractTTSModuleManager:
             self._init_baseline_model()
 
     def load_model(self, url=None, verbose=True):
+        """
+        Loads the weights of the model from the local checkpoint or download the checkpoint if url is given
+
+        :param url: URL to the remote store
+        :param verbose: Flag defines whether to print info or not
+        :return: None
+        """
+
         if url is not None:
             checkpoint = torch.hub.load_state_dict_from_url(url,
                                                             map_location=self.device,
@@ -44,6 +94,14 @@ class AbstractTTSModuleManager:
         return None
 
     def save_model(self, path=None, epoch=None):
+        """
+        Saves the states of the model and optimizer and the current epoch number
+
+        :param path: Path to the checkpoint file
+        :param epoch: Epoch number
+        :return: None
+        """
+
         state = {
             "model_state": self.model.state_dict()
         }
@@ -97,12 +155,12 @@ class AbstractTTSModuleManager:
 
     def _load_local_configs(self):
         """
-            Load all necessary main_configs
+        Load all necessary main_configs
         """
         raise NotImplementedError
 
     def _init_baseline_model(self):
         """
-            Initialize baseline model
+        Initialize baseline model
         """
         raise NotImplementedError

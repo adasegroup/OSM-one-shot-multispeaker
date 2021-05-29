@@ -4,6 +4,11 @@ from osms.tts_modules.synthesizer.configs import add_default_signal_processing_c
 
 
 def get_default_vocoder_config():
+    """
+    Creates the configuration CfgNode object for Vocoder and fills it with default values
+
+    :return: Instance of CfgNode
+    """
     _C = CN()
     _C.VERBOSE = True
 
@@ -22,6 +27,14 @@ def get_default_vocoder_config():
 
 
 def _add_default_wavernn_config(config, freeze=True):
+    """
+    Adds basic configurations for WaveRNN
+
+    :param config: Synthesizer config
+    :param freeze: Flag defines whether to freeze the configs after updating or nor
+    :return: updated config
+    """
+
     if config.is_frozen():
         config.defrost()
 
@@ -63,6 +76,16 @@ def _add_default_wavernn_config(config, freeze=True):
 
 
 def _add_default_signal_processing_config(config, freeze=True):
+    """
+   Adds SP CfgNode to :param config: containing signal processing parameters.
+   Signal Processing parameters are used in both synthesizer and vocoder.
+   Here most part of attributes are loaded from synthesizer's config.
+
+   :param config: Vocoder config
+   :param freeze: Flag defines whether to freeze :param config: after adding SP CfgNode
+   :return: updated config
+   """
+
     if config.is_frozen():
         config.defrost()
 

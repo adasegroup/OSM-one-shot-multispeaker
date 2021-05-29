@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 
 
-class RandomCycler: ### drop or re-write
+class RandomCycler:
     """
     Creates an internal copy of a sequence and allows access to its items in a constrained random
     order. For a source sequence of n items and one or several consecutive queries of a total
@@ -40,10 +40,11 @@ class RandomCycler: ### drop or re-write
         return self.sample(1)[0]
 
 
-
-
-# Contains the set of utterances of a single speaker
 class Speaker:
+    """
+    The class which contains the set of utterances of a single speaker
+    """
+
     def __init__(self, root: Path):
         self.root = root
         self.name = root.name
@@ -51,11 +52,17 @@ class Speaker:
         self.utterance_cycler = None
 
     def _load_utterances(self):
+        """
+        Loads utterances from sources and applies RandomCycler
+        :return: None
+        """
+
         with self.root.joinpath("_sources.txt").open("r") as sources_file:
             sources = [l.split(",") for l in sources_file]
         sources = {frames_fname: wave_fpath for frames_fname, wave_fpath in sources}
         self.utterances = [Utterance(f, w) for f, w in sources.items()]
         self.utterance_cycler = RandomCycler(self.utterances)
+        return None
 
     def random_partial(self, count, n_frames):
         """
@@ -70,6 +77,7 @@ class Speaker:
         frames are the frames of the partial utterances and range is the range of the partial
         utterance with regard to the complete utterance.
         """
+
         if self.utterances is None:
             self._load_utterances()
 
@@ -81,6 +89,10 @@ class Speaker:
 
 
 class SpeakerBatch:
+    """
+    The class which contains speakers and their partials used for collate func in dataloader
+    """
+
     def __init__(self, speakers: List[Speaker], utterances_per_speaker: int, n_frames: int):
         self.speakers = speakers
         self.partials = {s: s.random_partial(utterances_per_speaker, n_frames) for s in speakers}
@@ -91,6 +103,10 @@ class SpeakerBatch:
 
 
 class Utterance:
+    """
+    The class which represents utterances and manipulations whith them
+    """
+
     def __init__(self, frames_fpath, wave_fpath):
         self.frames_fpath = frames_fpath
         self.wave_fpath = wave_fpath

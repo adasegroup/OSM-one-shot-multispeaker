@@ -1,3 +1,7 @@
+"""
+This module contains many usefull functions for audio preprocessing, processing and postprocessing
+"""
+
 import librosa
 import librosa.filters
 import numpy as np

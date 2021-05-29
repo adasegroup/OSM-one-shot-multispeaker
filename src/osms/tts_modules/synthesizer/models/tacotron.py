@@ -328,6 +328,9 @@ class Decoder(nn.Module):
 
 
 class Tacotron(nn.Module):
+    """
+    Default Synthesizer model
+    """
     def __init__(self, embed_dims, num_chars, encoder_dims, decoder_dims, n_mels,
                  fft_bins, postnet_dims, encoder_K, lstm_dims, postnet_K, num_highways,
                  dropout, stop_threshold, speaker_embedding_size, verbose=False):

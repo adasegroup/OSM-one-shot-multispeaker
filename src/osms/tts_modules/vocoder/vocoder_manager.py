@@ -9,6 +9,40 @@ import os
 
 
 class VocoderManager(AbstractTTSModuleManager):
+    """
+    The main manager class which controls the vocoder model,
+    the corresponding datasets and dataloaders and the training and inference procedures.
+
+    Attributes
+    ----------
+    main_configs: yacs.config.CfgNode
+        main configurations
+    module_configs: yacs.config.CfgNode
+        Vocoder configurations
+    model: nn.Module
+        Vocoder NN model
+    model_name: str
+        Name of the model
+    optimizer: nn.optim.Optimizer
+        Pytorch optimizer
+    trainer: VocoderTrainer
+        VocoderTrainer instance
+
+    Methods
+    -------
+    infer_waveform(...)
+        Infers the waveform of a mel spectrogram output by the synthesizer.
+
+    train()
+        Launchs the training session
+
+    _load_local_configs()
+        Loads yacs configs for Vocoder
+
+    _init_baseline_model()
+        Initializes baseline model
+
+    """
     def __init__(self,
                  main_configs,
                  model=None,
@@ -28,14 +62,16 @@ class VocoderManager(AbstractTTSModuleManager):
         Infers the waveform of a mel spectrogram output by the synthesizer (the format must match
         that of the synthesizer!)
 
-        :param mel:
-        :param normalize:
-        :param batched:
-        :param target:
-        :param overlap:
-        :param do_save_wav:
-        :return: wav file
+        :param mel: mel-spectrograms used to create the rsulting wav file
+        :param normalize: Optional. The flag defines whether to normalize the mel-spectrograms or not
+        :param batched: Optional. Flag define whether to fold with overlap and to xfade and unfold or not
+        :param target: Optional. Target timesteps for each index of batch
+        :param overlap: Optional. Timesteps for both xfade and rnn warmup
+        :param do_save_wav: Optional. Flag define whether to save the resulting wav to a file or not
+
+        :return: The resulting wav
         """
+
         if self.model is None:
             raise Exception("Load WaveRNN, please!")
 
@@ -77,6 +113,7 @@ class VocoderManager(AbstractTTSModuleManager):
                              sample_rate=self.module_configs.SP.SAMPLE_RATE,
                              device=self.device,
                              mode=self.module_configs.MODEL.MODE,
+                             apply_preemphasis=self.module_configs.SP.PREEMPHASIZE,
                              verbose=self.module_configs.VERBOSE
                              ).to(self.device)
         if self.module_configs.MODEL.PRETRAINED:

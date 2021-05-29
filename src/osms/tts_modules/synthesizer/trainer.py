@@ -14,6 +14,10 @@ import time
 
 
 class SynthesizerTrainer:
+    """
+    The class-manager used to train the Synthesizer model
+    """
+
     def __init__(self, configs, model, optimizer):
         self.configs = configs
         self.model = model
@@ -34,6 +38,14 @@ class SynthesizerTrainer:
               save_every: int,
               backup_every: int
               ):
+        """
+        Main method to train the Synthesizer
+
+        :param run_id: ID of the run
+        :param save_every: Frequency of quick saving of checkpoint
+        :param backup_every: Frequency of backuping the model and optimizer
+        :return: None
+        """
         self.model.train()
         self.syn_dir = Path(self.syn_dir)
         self.models_dir = Path(self.models_dir)

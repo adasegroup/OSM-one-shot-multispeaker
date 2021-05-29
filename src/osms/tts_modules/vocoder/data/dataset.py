@@ -5,6 +5,10 @@ import torch
 
 
 class VocoderDataset(Dataset):
+    """
+   The Dataset child class with implementations for Vocoder needs
+   """
+
     def __init__(self, config, metadata_fpath, mel_dir, wav_dir):
         self.config = config
         print("Using inputs from:\n\t%s\n\t%s\n\t%s" % (metadata_fpath, mel_dir, wav_dir))
@@ -32,7 +36,6 @@ class VocoderDataset(Dataset):
             wav = audio.pre_emphasis(wav)
         wav = np.clip(wav, -1, 1)
 
-        # TODO: settle on whether this is any useful
         # Fix for missing padding
         r_pad = (len(wav) // self.config.SP.HOP_SIZE + 1) * self.config.SP.HOP_SIZE - len(wav)
         wav = np.pad(wav, (0, r_pad), mode='constant')
@@ -56,6 +59,10 @@ class VocoderDataset(Dataset):
 
 
 class VocoderDataloader(DataLoader):
+    """
+    The data loader class for VocoderDataset with implementations for Vocoder needs
+    """
+
     def __init__(self, config, dataset, num_workers=1, pin_memory=False, shuffle=True):
         self.dataset = dataset
         self.config = config

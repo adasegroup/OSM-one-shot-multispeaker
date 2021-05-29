@@ -12,25 +12,32 @@ import os
 
 
 class SpeakerEncoderManager(AbstractTTSModuleManager):
-    """Attributes
+    """
+        The main manager class which controls the speaker encoder model,
+        the corresponding datasets and dataloaders and the training and inference procedures.
+
+        Attributes
         ----------
-        main_configs: dict
-            dictionary of configuration files
+        main_configs: yacs.config.CfgNode
+            main configurations
+        module_configs: yacs.config.CfgNode
+            Speaker Encoder configurations
         preprocessor: AudioPreprocessor
             preprocess wav audio
         wav2mel: Wav2MelTransform
             transfrom preprocessed wav to mel spectogram
         current_embed: numpy.array
             the latest produced embedding
-        audio_config: dict
-            Audio Configuration file
-        device: int
-            Chosen device: GPU/CPU
-        model : nn.Module
+        model: nn.Module
             Speaker Encoder NN model
+        model_name: str
+            Name of the model
+        optimizer: nn.optim.Optimizer
+            Pytorch optimizer
+
         Methods
         -------
-        __init_baseline_model()
+        _init_baseline_model()
             initialize baseline model
 
         load_model()
@@ -51,6 +58,7 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
             partial utterances of <partial_utterance_n_frames> each.
 
         """
+
     def __init__(self,
                  main_configs,
                  model=None,
@@ -80,33 +88,32 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
         self.trainer = None
         self.dataset = None
 
-    def __init_trainer(self):
-        if self.train_dataloader is None:
-            dataset_preprocessor = PreprocessLibriSpeechDataset(self.module_configs, self.preprocessor, self.wav2mel)
-            dataset_preprocessor.preprocess_dataset()
-            train_dataset = SpeakerEncoderDataset(self.module_configs)
-            self.train_dataloader = SpeakerEncoderDataLoader(self.module_configs, train_dataset, 'train')
-        # if self.test_dataloader is None:
-        #     dataset_preprocessor = PreprocessLibriSpeechDataset(self.module_configs, self.preprocessor, self.wav2mel)
-        #     dataset_preprocessor.preprocess_dataset()
-        #     test_dataset = SpeakerEncoderDataset(self.module_configs)
-        #     self.test_dataloader = SpeakerEncoderDataLoader(self.module_configs, train_dataset, 'test')
-        if self.optimizer is None:
-            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.module_configs.TRAIN.LEARNING_RATE_INIT)
-        self.trainer = SpeakerEncoderTrainer(self.module_configs, self.model, self.train_dataloader,
-                                             self.test_dataloader, self.optimizer)
-
     def train_session(self, number_steps=None, each_n_print_steps=100):
+        """
+        Init train session using SpeakerEncoderTrainer
+        :param number_steps:
+        :param each_n_print_steps:
+        :return: None
+        """
         self.__init_trainer()
         self.trainer.init_training_session()
         if number_steps is None:
             self.trainer.train(self.module_configs.TRAIN.NUMBER_STEPS, each_n_print_steps)
         else:
             self.trainer.train(number_steps, each_n_print_steps)
+        return None
 
     def process_speaker(self, speaker_speech_path, save_embeddings_path=None,
                         save_embeddings_speaker_name="test_speaker"):
-        """ produce embeddings for one utterance"""
+        """
+        Processes the given *.wav file and produces the corresponding embeddings with the help of SpeakerEncoderManager
+
+        :param speaker_speech_path: The path to the *.wav file with sample recordings of new speaker
+        :param save_embeddings_path: Optional. The path for saving the obtained embeddings
+        :param save_embeddings_speaker_name: Optional. The name of the file for saving the obtained embeddings
+
+        :return: embeddings
+        """
         processed_wav = self.preprocessor.preprocess_wav(speaker_speech_path)
         embed = self.embed_utterance(processed_wav)
         self.current_embed = embed
@@ -133,6 +140,14 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
         np.save(os.path.join(save_embeddings_path, save_embeddings_speaker_name), self.current_embed)
 
     def embed_utterance(self, wav, using_partials=True, return_partials=False):
+        """
+        Produces the embeddings using the given wav object
+
+        :param wav: Wav object with speech
+        :param using_partials: Flag defines whether to use partials or not
+        :param return_partials: Flag defines whether to return partial embeddings and wave slices or not
+        :return: embeddings
+        """
         # Process the entire utterance if not using partials
         if not using_partials:
             # processed_wav = self.preprocessor.preprocess_wav(wav)
@@ -218,3 +233,19 @@ class SpeakerEncoderManager(AbstractTTSModuleManager):
             wav_slices = wav_slices[:-1]
 
         return wav_slices, mel_slices
+
+    def __init_trainer(self):
+        if self.train_dataloader is None:
+            dataset_preprocessor = PreprocessLibriSpeechDataset(self.module_configs, self.preprocessor, self.wav2mel)
+            dataset_preprocessor.preprocess_dataset()
+            train_dataset = SpeakerEncoderDataset(self.module_configs)
+            self.train_dataloader = SpeakerEncoderDataLoader(self.module_configs, train_dataset, 'train')
+        # if self.test_dataloader is None:
+        #     dataset_preprocessor = PreprocessLibriSpeechDataset(self.module_configs, self.preprocessor, self.wav2mel)
+        #     dataset_preprocessor.preprocess_dataset()
+        #     test_dataset = SpeakerEncoderDataset(self.module_configs)
+        #     self.test_dataloader = SpeakerEncoderDataLoader(self.module_configs, train_dataset, 'test')
+        if self.optimizer is None:
+            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.module_configs.TRAIN.LEARNING_RATE_INIT)
+        self.trainer = SpeakerEncoderTrainer(self.module_configs, self.model, self.train_dataloader,
+                                             self.test_dataloader, self.optimizer)

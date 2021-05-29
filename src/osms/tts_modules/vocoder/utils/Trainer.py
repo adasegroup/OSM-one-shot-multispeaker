@@ -13,6 +13,10 @@ import os
 
 
 class VocoderTrainer:
+    """
+    The class-manager used to train the Vocoder model
+    """
+
     def __init__(self, config, model, optimizer):
         self.config = config
         self.model = model

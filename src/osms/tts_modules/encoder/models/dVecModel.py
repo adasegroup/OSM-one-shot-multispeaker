@@ -7,10 +7,11 @@ import numpy as np
 import torch
 
 
-
-
-
 class DVecModel(nn.Module):
+    """
+    Default Speaker Encoder model
+    """
+
     def __init__(self, config):
         super().__init__()
         self.loss_device = config.DEVICE
@@ -68,6 +69,7 @@ class DVecModel(nn.Module):
     def similarity_matrix(self, embeds):
         """
         Computes the similarity matrix according the section 2.1 of GE2E.
+
         :param embeds: the embeddings as a tensor of shape (speakers_per_batch,
         utterances_per_speaker, embedding_size)
         :return: the similarity matrix as a tensor of shape (speakers_per_batch,
@@ -139,6 +141,12 @@ class DVecModel(nn.Module):
         return loss, eer
 
     def num_params(self, verbose=False):
+        """
+        Counts the number os trainable parameters
+
+        :param verbose: Flag defines whether to print info or not
+        :return: Number of parameters
+        """
         parameters = filter(lambda p: p.requires_grad, self.parameters())
         parameters = sum([np.prod(p.size()) for p in parameters]) / 1_000_000
         if verbose:
